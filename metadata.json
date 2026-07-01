@@ -1,0 +1,6 @@
+{
+  "name": "Retail and Maquila Inventory Ledger",
+  "description": "A comprehensive SaaS spreadsheet-style inventory management system for multi-store retail and Maquila processing, with automated piece-box conversions and real-time calculations.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
