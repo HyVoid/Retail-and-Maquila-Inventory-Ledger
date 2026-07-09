@@ -1,141 +1,194 @@
-import { LedgerState, ModelConfig } from '../types';
+import { LedgerState, ProductMaster } from '../types';
 
-export interface SkuInventoryRow {
-  skuKey: string; // "M01-Crimson-S"
-  modelId: string;
-  modelName: string;
-  category: string;
+export interface WHInventoryRow {
+  skuKey: string;
+  model: string;
   color: string;
   size: string;
-  safetyStock: number;
-  unitCost: number;
-  unitPrice: number;
-  stockByStore: { [storeName: string]: number };
-  totalStock: number;
+  unit: string;
+  costPrice: number;
+  inProduction: number;   // =SUMIFS(tbl_Breakdown[Qty_Pcs], tbl_Breakdown[SKU_Key], SKU_Key)
+  outTransfers: number;   // =SUMIFS(tbl_Transfers[Qty_Pcs], tbl_Transfers[SKU_Key], SKU_Key, tbl_Transfers[Source_Loc], "Warehouse")
+  outWHMerma: number;     // =SUMIFS(tbl_Merma[Qty_Pcs], tbl_Merma[SKU_Key], SKU_Key, tbl_Merma[Location], "Warehouse")
+  currentWHStock: number; // =In_Production - Out_Transfers - Out_WH_Merma
+}
+
+export interface StoreInventoryRow {
+  skuKey: string;
+  model: string;
+  color: string;
+  size: string;
+  costPrice: number;
+  stockByStore: { [storeName: string]: number }; // =SUMIFS(Transfers) - SUMIFS(Sales) - SUMIFS(Merma)
+  totalStoresStock: number;
+}
+
+export interface CombinedInventoryRow {
+  skuKey: string;
+  model: string;
+  color: string;
+  size: string;
+  costPrice: number;
+  whStock: number;
+  storeStocks: { [storeName: string]: number };
+  totalGlobalStock: number;
+  totalAssetValue: number;
 }
 
 /**
- * Calculates the dynamic real-time inventory level for all SKUs across all stores
- * based on Maquila breakdowns, transfers, and sales.
+ * 3.1 仓库库存引擎 (WH Inventory Engine)
+ * Calculations are dynamic arrays mimicking:
+ * =UNIQUE(tbl_Products[SKU_Key])
+ * =XLOOKUP(...)
+ * =SUMIFS(...)
  */
-export function calculateSkuInventory(state: LedgerState): SkuInventoryRow[] {
-  const rows: SkuInventoryRow[] = [];
+export function calculateWHInventory(state: LedgerState): WHInventoryRow[] {
+  return state.products.map(prod => {
+    const skuKey = prod.skuKey;
 
-  for (const model of state.models) {
-    const colors = Object.keys(model.colorDistribution);
-    const sizes = Object.keys(model.sizeDistribution);
+    // =SUMIFS(tbl_Breakdown[Qty_Pcs], tbl_Breakdown[SKU_Key], A2#)
+    const inProduction = state.breakdown
+      .filter(item => item.skuKey === skuKey)
+      .reduce((sum, item) => sum + item.qtyPcs, 0);
 
-    for (const color of colors) {
-      for (const size of sizes) {
-        const skuKey = `${model.id}-${color}-${size}`;
-        const stockByStore: { [store: string]: number } = {};
-        let totalStock = 0;
+    // =SUMIFS(tbl_Transfers[Qty_Pcs], tbl_Transfers[SKU_Key], A2#, tbl_Transfers[Source_Loc], "Warehouse")
+    const outTransfers = state.transfers
+      .filter(item => item.skuKey === skuKey && item.sourceLoc === "Warehouse")
+      .reduce((sum, item) => sum + item.qtyPcs, 0);
 
-        for (const store of state.stores) {
-          let stock = 0;
-          if (store === "Central Warehouse") {
-            // 1. Inflow from Maquila breakdowns
-            for (const batch of state.maquilaBatches) {
-              if (batch.modelId === model.id && batch.breakdown[skuKey] !== undefined) {
-                stock += batch.breakdown[skuKey];
-              }
-            }
-            // 2. Adjust for transfers
-            for (const transfer of state.transfers) {
-              if (transfer.skuKey === skuKey) {
-                if (transfer.source === "Central Warehouse") {
-                  stock -= transfer.quantity;
-                }
-                if (transfer.destination === "Central Warehouse") {
-                  stock += transfer.quantity;
-                }
-              }
-            }
-            // 3. Adjust for sales (if any)
-            for (const sale of state.sales) {
-              if (sale.skuKey === skuKey && sale.store === "Central Warehouse") {
-                stock -= sale.quantity;
-              }
-            }
-          } else {
-            // Retail stores
-            for (const transfer of state.transfers) {
-              if (transfer.skuKey === skuKey) {
-                if (transfer.destination === store) {
-                  stock += transfer.quantity;
-                }
-                if (transfer.source === store) {
-                  stock -= transfer.quantity;
-                }
-              }
-            }
-            for (const sale of state.sales) {
-              if (sale.skuKey === skuKey && sale.store === store) {
-                stock -= sale.quantity;
-              }
-            }
-          }
-          stockByStore[store] = stock;
-          totalStock += stock;
-        }
+    // =SUMIFS(tbl_Merma[Qty_Pcs], tbl_Merma[SKU_Key], A2#, tbl_Merma[Location], "Warehouse")
+    const outWHMerma = state.merma
+      .filter(item => item.skuKey === skuKey && item.location === "Warehouse")
+      .reduce((sum, item) => sum + item.qtyPcs, 0);
 
-        rows.push({
-          skuKey,
-          modelId: model.id,
-          modelName: model.name,
-          category: model.category,
-          color,
-          size,
-          safetyStock: model.safetyStock,
-          unitCost: model.unitCost,
-          unitPrice: model.unitPrice,
-          stockByStore,
-          totalStock
-        });
-      }
-    }
-  }
+    // =E2# - F2# - G2#
+    const currentWHStock = inProduction - outTransfers - outWHMerma;
 
-  return rows;
+    return {
+      skuKey,
+      model: prod.model,
+      color: prod.color,
+      size: prod.size,
+      unit: prod.unit,
+      costPrice: prod.costPrice,
+      inProduction,
+      outTransfers,
+      outWHMerma,
+      currentWHStock
+    };
+  });
+}
+
+/**
+ * 3.2 门店库存二维矩阵引擎 (Store Inventory Engine)
+ * Rows: all SKU keys
+ * Columns: retail stores (excluding "Warehouse")
+ * Cell Formula: =SUMIFS(tbl_Transfers) - SUMIFS(tbl_Sales) - SUMIFS(tbl_Merma)
+ */
+export function calculateStoreInventory(state: LedgerState): StoreInventoryRow[] {
+  const retailStores = state.params.stores.filter(s => s !== "Warehouse");
+
+  return state.products.map(prod => {
+    const skuKey = prod.skuKey;
+    const stockByStore: { [storeName: string]: number } = {};
+    let totalStoresStock = 0;
+
+    retailStores.forEach(store => {
+      // + SUMIFS(tbl_Transfers[Qty_Pcs], tbl_Transfers[SKU_Key], SKU_Key, tbl_Transfers[Dest_Store], Store)
+      const inboundTransfer = state.transfers
+        .filter(item => item.skuKey === skuKey && item.destStore === store)
+        .reduce((sum, item) => sum + item.qtyPcs, 0);
+
+      // - SUMIFS(tbl_Sales[Qty_Pcs], tbl_Sales[SKU_Key], SKU_Key, tbl_Sales[Store_Name], Store)
+      const salesQty = state.sales
+        .filter(item => item.skuKey === skuKey && item.storeName === store)
+        .reduce((sum, item) => sum + item.qtyPcs, 0);
+
+      // - SUMIFS(tbl_Merma[Qty_Pcs], tbl_Merma[SKU_Key], SKU_Key, tbl_Merma[Location], Store)
+      const storeMerma = state.merma
+        .filter(item => item.skuKey === skuKey && item.location === store)
+        .reduce((sum, item) => sum + item.qtyPcs, 0);
+
+      // Final cell calculation
+      const netStock = inboundTransfer - salesQty - storeMerma;
+      stockByStore[store] = netStock;
+      totalStoresStock += netStock;
+    });
+
+    return {
+      skuKey,
+      model: prod.model,
+      color: prod.color,
+      size: prod.size,
+      costPrice: prod.costPrice,
+      stockByStore,
+      totalStoresStock
+    };
+  });
+}
+
+/**
+ * Combined view for easy ledger display
+ */
+export function calculateCombinedInventory(state: LedgerState): CombinedInventoryRow[] {
+  const whInventory = calculateWHInventory(state);
+  const storeInventory = calculateStoreInventory(state);
+
+  return state.products.map((prod, index) => {
+    const whRow = whInventory[index];
+    const stRow = storeInventory[index];
+
+    const whStock = whRow ? whRow.currentWHStock : 0;
+    const storeStocks = stRow ? stRow.stockByStore : {};
+    const totalGlobalStock = whStock + (stRow ? stRow.totalStoresStock : 0);
+    const totalAssetValue = totalGlobalStock * prod.costPrice;
+
+    return {
+      skuKey: prod.skuKey,
+      model: prod.model,
+      color: prod.color,
+      size: prod.size,
+      costPrice: prod.costPrice,
+      whStock,
+      storeStocks,
+      totalGlobalStock,
+      totalAssetValue
+    };
+  });
 }
 
 export interface StoreFinancialRow {
   storeName: string;
-  unitsSold: number;
-  grossSales: number;
-  estCOGS: number;
-  grossProfit: number;
+  pcsSold: number;
+  revenue: number; // GMV
+  cogs: number; // cost of goods sold
+  grossProfit: number; // gross margin $
   profitMargin: number; // percentage
 }
 
 /**
- * Calculates store performance data for gross margins, sales volumes, and profits.
+ * Calculates store-by-store sales, revenue, and COGS
  */
-export function calculateStorePerformance(state: LedgerState): StoreFinancialRow[] {
-  // We only show retail stores (excluding Central Warehouse, or optionally including it)
-  return state.stores.map(store => {
-    const storeSales = state.sales.filter(s => s.store === store);
-    let unitsSold = 0;
-    let grossSales = 0;
-    let estCOGS = 0;
+export function calculateStoreFinancials(state: LedgerState): StoreFinancialRow[] {
+  return state.params.stores.map(store => {
+    const sales = state.sales.filter(s => s.storeName === store);
+    const pcsSold = sales.reduce((sum, s) => sum + s.qtyPcs, 0);
+    const revenue = sales.reduce((sum, s) => sum + s.revenue, 0);
 
-    for (const sale of storeSales) {
-      unitsSold += sale.quantity;
-      grossSales += sale.totalAmount;
-      // lookup unit cost
-      const model = state.models.find(m => m.id === sale.modelId);
-      const costPerPiece = model ? model.unitCost : 0;
-      estCOGS += sale.quantity * costPerPiece;
-    }
+    const cogs = sales.reduce((sum, s) => {
+      const prod = state.products.find(p => p.skuKey === s.skuKey);
+      const unitCost = prod ? prod.costPrice : 0;
+      return sum + s.qtyPcs * unitCost;
+    }, 0);
 
-    const grossProfit = grossSales - estCOGS;
-    const profitMargin = grossSales > 0 ? (grossProfit / grossSales) * 100 : 0;
+    const grossProfit = revenue - cogs;
+    const profitMargin = revenue > 0 ? (grossProfit / revenue) * 100 : 0;
 
     return {
       storeName: store,
-      unitsSold,
-      grossSales,
-      estCOGS,
+      pcsSold,
+      revenue,
+      cogs,
       grossProfit,
       profitMargin
     };

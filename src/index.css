@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
 @import "tailwindcss";
 
 :root {
@@ -9,12 +10,12 @@
   --color-body-text:  #1A1A2E;
   
   /* Semantic */
-  --color-positive:   #00C853;   /* Green for target met */
-  --color-negative:   #D32F2F;   /* Red for anomaly */
+  --color-positive:   #00C853;   /* met/exceeded target threshold — rare */
+  --color-negative:   #D32F2F;   /* anomaly requiring action — rare     */
   
   /* Surface */
   --color-surface:    #FFFFFF;
-  --color-input-bg:   #FFFDE7;   /* Pale yellow for editable fields */
+  --color-input-bg:   #FFFDE7;   /* pale yellow for editable fields */
   --color-border:     #E8E8E6;
   
   /* Navigation */
@@ -23,14 +24,22 @@
   --nav-text:         #051C2C;
   --nav-text-inactive: rgba(5, 28, 44, 0.45);
   
+  /* Table Header */
+  --table-header-bg:  rgba(5, 28, 44, 0.04);
+  --table-header-sep: rgba(5, 28, 44, 0.12);
+
+  /* Insight & Anomaly Surfaces */
+  --insight-bg:       rgba(34, 81, 255, 0.04);
+  --anomaly-bg:       rgba(211, 47, 47, 0.04);
+
   /* Typography */
-  --font-heading:     'EB Garamond', Georgia, serif;
-  --font-body:        'Noto Sans', sans-serif;
+  --font-heading:     'EB Garamond', 'Garamond', Georgia, serif;
+  --font-body:        'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
   
   /* Tracking */
   --tracking-display: -0.03em;
   --tracking-heading: -0.02em;
-  --tracking-label:    0.06em;
+  --tracking-label:    0.05em;
   
   /* Radius */
   --radius-sm:   6px;
@@ -99,14 +108,15 @@ body {
 /* Cards with depth and spring hover animation */
 .custom-card {
   background-color: var(--color-surface);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-sm);
   border-radius: var(--radius-md);
-  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1.0), box-shadow 0.25s ease;
+  border: 1px solid var(--color-border);
+  transition: transform 220ms ease, box-shadow 220ms ease;
 }
 
 .custom-card:hover {
   transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-md);
 }
 
 /* Clickable cells scale and brightness feedback */
@@ -116,8 +126,8 @@ body {
 }
 
 .clickable-cell:hover {
-  transform: scale(1.04);
-  filter: brightness(1.05);
+  transform: scale(1.02);
+  filter: brightness(1.02);
 }
 
 /* Inputs with yellow background */
@@ -138,7 +148,7 @@ body {
 
 /* Insight component block style */
 .insight-block {
-  background-color: rgba(34, 81, 255, 0.04);
+  background-color: var(--insight-bg);
   border-left: 3px solid var(--color-accent);
   border-radius: 0 var(--radius-md) var(--radius-md) 0;
   padding: 12px 16px;
@@ -146,7 +156,7 @@ body {
 
 /* Anomaly alert blocks */
 .anomaly-block {
-  background-color: rgba(211, 47, 47, 0.04);
+  background-color: var(--anomaly-bg);
   border-left: 3px solid var(--color-negative);
   border-radius: 0 var(--radius-md) var(--radius-md) 0;
   padding: 12px 16px;

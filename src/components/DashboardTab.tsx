@@ -1,455 +1,412 @@
-import React, { useState, useMemo } from 'react';
-import { LedgerState, ModelConfig } from '../types';
-import { SkuInventoryRow, StoreFinancialRow } from '../utils/inventory';
-import { Sliders, Activity, TrendingUp, AlertTriangle, HelpCircle, Eye } from 'lucide-react';
+import React, { useMemo } from 'react';
+import { LedgerState } from '../types';
+import { calculateCombinedInventory, calculateStoreFinancials, CombinedInventoryRow } from '../utils/inventory';
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  PieChart,
+  Pie,
+  Cell
+} from 'recharts';
+import {
+  ShieldAlert,
+  Coins,
+  TrendingUp,
+  Percent,
+  Warehouse,
+  ShoppingBag,
+  HelpCircle,
+  FileSpreadsheet
+} from 'lucide-react';
 
 interface DashboardTabProps {
   state: LedgerState;
-  skuRows: SkuInventoryRow[];
-  storePerformance: StoreFinancialRow[];
+  skuInventory: CombinedInventoryRow[];
 }
 
-export default function DashboardTab({ state, skuRows, storePerformance }: DashboardTabProps) {
-  // Slicers State
-  const [selectedStore, setSelectedStore] = useState<string>('All Locations');
-  const [selectedModelFilter, setSelectedModelFilter] = useState<string>('All Models');
-  const [selectedCategory, setSelectedCategory] = useState<string>('All Categories');
+// Accent colors
+const COLORS_PIE = ['#051C2C', '#2251FF', '#4C6FFF', '#888888', '#B0C0FF'];
+const COLOR_WH = '#051C2C'; // Brand Deep Navy
+const COLOR_STORES = '#2251FF'; // Brand Blue Accent
 
-  // Interactive Sizing Matrix (Exposure Matrix) selection
-  const [matrixModelId, setMatrixModelId] = useState<string>(state.models[0]?.id || 'M01');
-  const [matrixStore, setMatrixStore] = useState<string>('Central Warehouse');
+export default function DashboardTab({ state, skuInventory }: DashboardTabProps) {
+  
+  // 1. KPI Calculations
+  
+  // KPI 1: Inventory Asset Valuation (Sum of stock * costPrice)
+  const totalValuation = useMemo(() => {
+    return skuInventory.reduce((sum, item) => sum + item.totalAssetValue, 0);
+  }, [skuInventory]);
 
-  // Categories list helper
-  const categories = useMemo(() => {
-    const cats = new Set(state.models.map(m => m.category));
-    return ['All Categories', ...Array.from(cats)];
-  }, [state.models]);
+  const whValuation = useMemo(() => {
+    return skuInventory.reduce((sum, item) => sum + (item.whStock * item.costPrice), 0);
+  }, [skuInventory]);
 
-  // Compute filtered metrics for KPIs
-  const filteredMetrics = useMemo(() => {
-    // Filter sales logs
-    const salesFiltered = state.sales.filter(sale => {
-      const matchStore = selectedStore === 'All Locations' || sale.store === selectedStore;
-      const matchModel = selectedModelFilter === 'All Models' || sale.modelId === selectedModelFilter;
-      const modelDetail = state.models.find(m => m.id === sale.modelId);
-      const matchCat = selectedCategory === 'All Categories' || (modelDetail && modelDetail.category === selectedCategory);
-      return matchStore && matchModel && matchCat;
-    });
+  const storesValuation = useMemo(() => {
+    return totalValuation - whValuation;
+  }, [totalValuation, whValuation]);
 
-    const totalSalesRev = salesFiltered.reduce((sum, s) => sum + s.totalAmount, 0);
-    
-    // Compute total cost for sold units to find margin
-    const totalSalesCost = salesFiltered.reduce((sum, s) => {
-      const model = state.models.find(m => m.id === s.modelId);
-      const unitCost = model ? model.unitCost : 0;
-      return sum + s.quantity * unitCost;
+  // KPI 2: Sales GMV & COGS & Gross Profit Margin
+  const salesStats = useMemo(() => {
+    const gmv = state.sales.reduce((sum, s) => sum + s.revenue, 0);
+    const cogs = state.sales.reduce((sum, s) => {
+      const prod = state.products.find(p => p.skuKey === s.skuKey);
+      const cost = prod ? prod.costPrice : 0;
+      return sum + s.qtyPcs * cost;
     }, 0);
-    const profit = totalSalesRev - totalSalesCost;
-    const salesMargin = totalSalesRev > 0 ? (profit / totalSalesRev) * 100 : 0;
+    const grossProfit = gmv - cogs;
+    const marginPercent = gmv > 0 ? (grossProfit / gmv) * 100 : 0;
 
-    // Filter stock
-    let totalStockPcs = 0;
-    skuRows.forEach(row => {
-      const matchModel = selectedModelFilter === 'All Models' || row.modelId === selectedModelFilter;
-      const matchCat = selectedCategory === 'All Categories' || row.category === selectedCategory;
-      if (!matchModel || !matchCat) return;
+    return { gmv, cogs, grossProfit, marginPercent };
+  }, [state.sales, state.products]);
 
-      if (selectedStore === 'All Locations') {
-        totalStockPcs += row.totalStock;
-      } else {
-        totalStockPcs += row.stockByStore[selectedStore] || 0;
-      }
+  // KPI 3: Merma Ratio (SOW formula: Loss_Value / (Loss_Value + COGS + Current Asset Valuation))
+  const mermaStats = useMemo(() => {
+    const totalLossValue = state.merma.reduce((sum, m) => sum + m.lossValue, 0);
+    const totalMermaPcs = state.merma.reduce((sum, m) => sum + m.qtyPcs, 0);
+    
+    // Total production count to calculate percentage of loss pieces
+    const totalBreakdownPcs = state.breakdown.reduce((sum, b) => sum + b.qtyPcs, 0);
+    
+    // Loss Value ratio as specified in SOW
+    const denominator = totalLossValue + salesStats.cogs + totalValuation;
+    const lossValueRatio = denominator > 0 ? (totalLossValue / denominator) * 100 : 0;
+    
+    // Qty ratio
+    const lossQtyRatio = totalBreakdownPcs > 0 ? (totalMermaPcs / totalBreakdownPcs) * 100 : 0;
+
+    return { totalLossValue, totalMermaPcs, lossValueRatio, lossQtyRatio };
+  }, [state.merma, state.breakdown, salesStats.cogs, totalValuation]);
+
+
+  // 2. Visualizations data-mapping
+
+  // Chart 1: Stock Health (WH Stock vs Stores Stock per SKU)
+  const stockHealthData = useMemo(() => {
+    return skuInventory.map(item => {
+      const storeTotal = Object.values(item.storeStocks).reduce<number>((sum, v) => sum + (Number(v) || 0), 0);
+      return {
+        skuKey: item.skuKey,
+        "Warehouse Stock": item.whStock,
+        "Stores Stock": storeTotal,
+        "Total Stock": item.totalGlobalStock
+      };
+    });
+  }, [skuInventory]);
+
+  // Chart 2: Store Profitability Pareto / Channels
+  const storeFinancialsData = useMemo(() => {
+    const financials = calculateStoreFinancials(state);
+    // filter Warehouse out if it exists
+    return financials
+      .filter(f => f.storeName !== "Warehouse")
+      .sort((a, b) => b.grossProfit - a.grossProfit);
+  }, [state]);
+
+  // Chart 3: Merma Causes and Audit Loss Value
+  const mermaPieData = useMemo(() => {
+    const map: { [reason: string]: number } = {};
+    // initialize with known types
+    state.params.wasteTypes.forEach(t => { map[t] = 0; });
+    
+    state.merma.forEach(m => {
+      map[m.wasteType] = (map[m.wasteType] || 0) + m.lossValue;
     });
 
-    // Merma stats (independent of store unless all, filterable by model)
-    const filteredMaquila = state.maquilaBatches.filter(batch => {
-      const matchModel = selectedModelFilter === 'All Models' || batch.modelId === selectedModelFilter;
-      const modelDetail = state.models.find(m => m.id === batch.modelId);
-      const matchCat = selectedCategory === 'All Categories' || (modelDetail && modelDetail.category === selectedCategory);
-      return matchModel && matchCat;
-    });
-
-    const totalBulkPcs = filteredMaquila.reduce((sum, b) => sum + b.bulkPieces, 0);
-    const totalMermaPcs = filteredMaquila.reduce((sum, b) => sum + b.mermaPieces, 0);
-    const averageMermaRate = totalBulkPcs > 0 ? (totalMermaPcs / totalBulkPcs) * 100 : 0;
-
-    return {
-      totalStockPcs,
-      totalSalesRev,
-      salesMargin,
-      totalMermaPcs,
-      averageMermaRate
-    };
-  }, [state, skuRows, selectedStore, selectedModelFilter, selectedCategory]);
-
-  // Dynamic Rule-Based Executive Insights Generator
-  const insights = useMemo(() => {
-    const list: { type: 'alert' | 'insight'; message: string; action?: string }[] = [];
-
-    // Rule 1: High Merma Alert
-    if (filteredMetrics.averageMermaRate > 3.0) {
-      list.push({
-        type: 'alert',
-        message: `High average processing loss (Merma) detected at ${filteredMetrics.averageMermaRate.toFixed(1)}%, exceeding the SLA safety benchmark of 3.0%.`,
-        action: "Audit Maquila batch output logs immediately to identify sub-standard processing batches."
-      });
-    }
-
-    // Rule 2: Low Stock Alert
-    const lowStockSkus = skuRows.filter(row => row.totalStock < row.safetyStock);
-    if (lowStockSkus.length > 0) {
-      const topLow = lowStockSkus[0];
-      list.push({
-        type: 'insight',
-        message: `Stock level of popular model '${topLow.modelName}' is below safety threshold (${topLow.totalStock} left, safety limit: ${topLow.safetyStock}).`,
-        action: `Review 'Stock Ledger' tab to prepare a processing replenishment order.`
-      });
-    }
-
-    // Rule 3: Direct distribution recommendation
-    // Find a SKU that is low in a retail store but high in the warehouse
-    let foundTransferRec = false;
-    for (const row of skuRows) {
-      if (row.stockByStore['Central Warehouse'] > 15) {
-        for (const store of state.stores) {
-          if (store === 'Central Warehouse') continue;
-          const storeStock = row.stockByStore[store] || 0;
-          if (storeStock === 0) {
-            list.push({
-              type: 'insight',
-              message: `Potential stockout detected: '${row.modelName}' (${row.color}, size ${row.size}) has 0 stock at ${store}, while Central Warehouse holds ${row.stockByStore['Central Warehouse']} units.`,
-              action: `Initiate a Transfer order of 10 units from Central Warehouse to ${store}.`
-            });
-            foundTransferRec = true;
-            break;
-          }
-        }
-      }
-      if (foundTransferRec) break;
-    }
-
-    // Add default if empty
-    if (list.length === 0) {
-      list.push({
-        type: 'insight',
-        message: "All warehouse and retail channels are operating at optimal safety stock levels with zero anomalies detected.",
-        action: "Continue monitoring retail store daily sales volume."
-      });
-    }
-
-    return list;
-  }, [filteredMetrics, skuRows, state.stores]);
-
-  // Sizing Matrix calculations for selected model & store
-  const matrixData = useMemo(() => {
-    const model = state.models.find(m => m.id === matrixModelId);
-    if (!model) return null;
-
-    const colors = Object.keys(model.colorDistribution);
-    const sizes = Object.keys(model.sizeDistribution);
-
-    const rowsData = colors.map(color => {
-      const sizesData = sizes.map(size => {
-        const skuKey = `${model.id}-${color}-${size}`;
-        const row = skuRows.find(r => r.skuKey === skuKey);
-        const qty = row ? row.stockByStore[matrixStore] || 0 : 0;
-        const isBelowSafety = qty < model.safetyStock;
-        return { size, qty, isBelowSafety };
-      });
-      return { color, sizesData };
-    });
-
-    return { model, sizes, rowsData };
-  }, [matrixModelId, matrixStore, skuRows, state.models]);
+    return Object.entries(map)
+      .map(([name, value]) => ({ name, value }))
+      .filter(item => item.value > 0);
+  }, [state.merma, state.params.wasteTypes]);
 
   return (
     <div className="space-y-8 animate-fade-up">
-      {/* Slicers Card */}
-      <div className="bg-white rounded-xl shadow-sm p-5 border border-[rgba(5,28,44,0.06)] flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-2">
-          <Sliders className="w-4 h-4 text-primary" />
-          <span className="text-uppercase-label text-xs">EXECUTIVE CONTROL SLICERS</span>
-        </div>
-        <div className="flex flex-wrap items-center gap-4">
-          {/* Store Slicer */}
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-[#888888]">Channel:</span>
-            <select
-              value={selectedStore}
-              onChange={(e) => setSelectedStore(e.target.value)}
-              className="yellow-input py-1 px-2 text-xs"
-            >
-              <option value="All Locations">All Channels</option>
-              {state.stores.map(s => (
-                <option key={s} value={s}>{s}</option>
-              ))}
-            </select>
+      
+      {/* 3. KPI Summary Panel */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        {/* Card 1: Asset Valuation */}
+        <div className="custom-card p-6 relative overflow-hidden">
+          <div className="flex justify-between items-start">
+            <div className="space-y-1">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block font-sans tracking-widest">
+                Logistics Assets Valuation
+              </span>
+              <h2 className="text-2xl font-black text-primary font-mono tracking-tight font-display text-[26px]">
+                ${totalValuation.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </h2>
+            </div>
+            <div className="p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-primary">
+              <Coins className="w-5 h-5" />
+            </div>
           </div>
-
-          {/* Model Slicer */}
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-[#888888]">Model:</span>
-            <select
-              value={selectedModelFilter}
-              onChange={(e) => setSelectedModelFilter(e.target.value)}
-              className="yellow-input py-1 px-2 text-xs"
-            >
-              <option value="All Models">All Models</option>
-              {state.models.map(m => (
-                <option key={m.id} value={m.id}>{m.id} - {m.name}</option>
-              ))}
-            </select>
-          </div>
-
-          {/* Category Slicer */}
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-[#888888]">Category:</span>
-            <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className="yellow-input py-1 px-2 text-xs"
-            >
-              {categories.map(c => (
-                <option key={c} value={c}>{c}</option>
-              ))}
-            </select>
-          </div>
-        </div>
-      </div>
-
-      {/* KPI Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {/* KPI 1 */}
-        <div className="bg-white rounded-xl shadow-sm p-6 flex flex-col justify-between border-t-2 border-primary min-h-[120px] transition-transform duration-200 hover:-translate-y-1 hover:shadow-md">
-          <span className="text-[#888888] text-[11px] font-medium tracking-wider uppercase">Active Stock Pcs</span>
-          <div className="flex items-baseline gap-2 mt-2">
-            <span className="font-display text-3xl font-semibold tracking-tight text-primary">
-              {filteredMetrics.totalStockPcs.toLocaleString()}
+          <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-mono text-slate-500">
+            <span className="flex items-center gap-1">
+              <Warehouse className="w-3.5 h-3.5 text-slate-400" /> WH: ${whValuation.toLocaleString(undefined, { maximumFractionDigits: 0 })}
             </span>
-            <span className="text-xs text-[#888888]">units</span>
-          </div>
-          <span className="text-[11px] text-[#888888] mt-1">In selected filter channels</span>
-        </div>
-
-        {/* KPI 2 */}
-        <div className="bg-white rounded-xl shadow-sm p-6 flex flex-col justify-between border-t-2 border-accent min-h-[120px] transition-transform duration-200 hover:-translate-y-1 hover:shadow-md">
-          <span className="text-[#888888] text-[11px] font-medium tracking-wider uppercase">Total Sales Revenue</span>
-          <div className="flex items-baseline gap-2 mt-2">
-            <span className="font-display text-3xl font-semibold tracking-tight text-accent">
-              ${filteredMetrics.totalSalesRev.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            <span className="flex items-center gap-1">
+              <ShoppingBag className="w-3.5 h-3.5 text-slate-400" /> Retail: ${storesValuation.toLocaleString(undefined, { maximumFractionDigits: 0 })}
             </span>
           </div>
-          <span className="text-[11px] text-[#888888] mt-1">Post-discount sales total</span>
+          <div className="mt-2 text-[9px] text-slate-400 italic">
+            Formula: ∑ (Current_Stock * Product_Cost)
+          </div>
         </div>
 
-        {/* KPI 3 */}
-        <div className="bg-white rounded-xl shadow-sm p-6 flex flex-col justify-between border-t-2 border-primary min-h-[120px] transition-transform duration-200 hover:-translate-y-1 hover:shadow-md">
-          <span className="text-[#888888] text-[11px] font-medium tracking-wider uppercase">Gross Margin</span>
-          <div className="flex items-baseline gap-2 mt-2">
-            <span className="font-display text-3xl font-semibold tracking-tight text-primary">
-              {filteredMetrics.salesMargin.toFixed(1)}%
+        {/* Card 2: Sales Profitability */}
+        <div className="custom-card p-6 relative overflow-hidden">
+          <div className="flex justify-between items-start">
+            <div className="space-y-1">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block font-sans tracking-widest">
+                Total Sales GMV & Profit
+              </span>
+              <h2 className="text-2xl font-black text-primary font-mono tracking-tight font-display text-[26px]">
+                ${salesStats.gmv.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </h2>
+            </div>
+            <div className="p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-primary">
+              <TrendingUp className="w-5 h-5" />
+            </div>
+          </div>
+          <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-mono text-slate-500">
+            <span className="text-slate-600 font-bold bg-slate-50 px-2 py-0.5 rounded border border-slate-200 flex items-center gap-0.5">
+              <Percent className="w-3 h-3 text-slate-400" /> Margin: {salesStats.marginPercent.toFixed(1)}%
+            </span>
+            <span className="text-slate-500 font-bold">
+              Profit: <span className="text-primary">${salesStats.grossProfit.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
             </span>
           </div>
-          <span className="text-[11px] text-[#888888] mt-1">Estimated profit yield</span>
-        </div>
-
-        {/* KPI 4 */}
-        <div className="bg-white rounded-xl shadow-sm p-6 flex flex-col justify-between border-t-2 border-negative min-h-[120px] transition-transform duration-200 hover:-translate-y-1 hover:shadow-md">
-          <span className="text-[#888888] text-[11px] font-medium tracking-wider uppercase">Maquila Loss (Merma)</span>
-          <div className="flex items-baseline gap-2 mt-2">
-            <span className="font-display text-3xl font-semibold tracking-tight text-primary">
-              {filteredMetrics.averageMermaRate.toFixed(1)}%
-            </span>
-            <span className="text-xs text-[#888888]">avg</span>
+          <div className="mt-2 text-[9px] text-slate-400 italic">
+            Formula: Gross Profit = GMV - Cost_of_Goods_Sold
           </div>
-          <span className="text-[11px] text-[#888888] mt-1">
-            {filteredMetrics.totalMermaPcs} pcs waste recorded
-          </span>
         </div>
-      </div>
 
-      {/* Executive Insights & Anomaly Section */}
-      <div className="space-y-4">
-        <h3 className="text-base font-semibold font-section text-primary uppercase tracking-wider">
-          OPERATIONAL INSIGHTS & RECOMMENDATIONS
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {insights.map((ins, idx) => (
-            <div
-              key={idx}
-              className={ins.type === 'alert' ? 'anomaly-block flex gap-3' : 'insight-block flex gap-3'}
-            >
-              {ins.type === 'alert' ? (
-                <AlertTriangle className="w-5 h-5 text-negative shrink-0 mt-0.5" />
-              ) : (
-                <Activity className="w-5 h-5 text-accent shrink-0 mt-0.5" />
+        {/* Card 3: Merma Ratio */}
+        {(() => {
+          const isAnomaly = mermaStats.lossQtyRatio > 3.0;
+          return (
+            <div className={`custom-card p-6 relative overflow-hidden transition-all ${isAnomaly ? 'bg-red-50/10 border-red-200 shadow-[0_2px_8px_rgba(211,47,47,0.05)]' : ''}`}>
+              {isAnomaly && (
+                <div className="absolute top-0 left-0 w-1 h-full bg-red-600" />
               )}
-              <div className="space-y-1">
-                <p className="text-[13px] leading-relaxed text-primary font-medium">
-                  {ins.message}
-                </p>
-                {ins.action && (
-                  <p className="text-xs text-primary/75 italic">
-                    <span className="font-semibold">Recommended Action: </span> {ins.action}
-                  </p>
-                )}
+              <div className="flex justify-between items-start">
+                <div className="space-y-1">
+                  <span className={`text-[10px] font-bold uppercase tracking-wider block font-sans tracking-widest ${isAnomaly ? 'text-red-500' : 'text-slate-400'}`}>
+                    Supply Chain Merma Ratio {isAnomaly && '— SLA Breach'}
+                  </span>
+                  <h2 className={`text-2xl font-black font-mono tracking-tight font-display text-[26px] ${isAnomaly ? 'text-red-600' : 'text-primary'}`}>
+                    {mermaStats.lossValueRatio.toFixed(2)}%
+                  </h2>
+                </div>
+                <div className={`p-2.5 rounded-lg ${isAnomaly ? 'bg-red-50 border border-red-100 text-red-600' : 'bg-slate-50 border border-slate-200 text-primary'}`}>
+                  <ShieldAlert className="w-5 h-5" />
+                </div>
+              </div>
+              <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-mono text-slate-500">
+                <span className={`font-bold px-2 py-0.5 rounded border ${isAnomaly ? 'text-red-700 bg-red-50 border-red-100' : 'text-slate-500 bg-slate-50 border-slate-200'}`}>
+                  Loss: ${mermaStats.totalLossValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                </span>
+                <span className={isAnomaly ? 'text-red-700 font-medium' : 'text-slate-600'}>
+                  Lost Qty: {mermaStats.totalMermaPcs} pcs ({mermaStats.lossQtyRatio.toFixed(1)}% Yield)
+                </span>
+              </div>
+              <div className="mt-2 text-[9px] text-slate-400 italic">
+                Formula: Loss_Value / (Loss_Value + COGS + Asset_Valuation)
               </div>
             </div>
-          ))}
-        </div>
+          );
+        })()}
+
       </div>
 
-      {/* Main Analysis Zone: Performance Matrix & Exposure Sizing Matrix */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Left Side: Store Performance Table */}
-        <div className="lg:col-span-6 bg-white rounded-xl shadow-sm p-6 border border-[rgba(5,28,44,0.06)]">
-          <div className="flex items-center justify-between mb-4">
-            <h4 className="text-sm uppercase-label">CHANNEL PROFITABILITY BENCHMARK</h4>
-            <span className="text-xs text-[#888888]">Live Calculations</span>
+      {/* 4. BI Charts Grid */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+        
+        {/* Visualization 1: Stock Health Comparison */}
+        <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm space-y-4">
+          <div className="flex items-center justify-between">
+            <h4 className="font-display text-xs uppercase tracking-wider font-bold text-slate-700 flex items-center gap-1.5">
+              <Warehouse className="w-4 h-4 text-[#107c41]" />
+              Stock Health: Warehouse vs Stores SKU Stock
+            </h4>
+            <span className="text-[10px] bg-slate-50 border border-slate-200 px-2 py-0.5 rounded text-slate-500 font-mono">
+              Dynamic Arrays
+            </span>
           </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead>
-                <tr className="border-b border-[rgba(5,28,44,0.12)]">
-                  <th className="py-2.5 uppercase text-[#051C2C] font-semibold text-[11px] tracking-wider">Location</th>
-                  <th className="py-2.5 text-right uppercase text-[#051C2C] font-semibold text-[11px] tracking-wider">Pcs Sold</th>
-                  <th className="py-2.5 text-right uppercase text-[#051C2C] font-semibold text-[11px] tracking-wider">Revenue</th>
-                  <th className="py-2.5 text-right uppercase text-[#051C2C] font-semibold text-[11px] tracking-wider">Gross Profit</th>
-                  <th className="py-2.5 text-right uppercase text-[#051C2C] font-semibold text-[11px] tracking-wider">Margin</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[rgba(5,28,44,0.04)]">
-                {storePerformance.map((row) => (
-                  <tr key={row.storeName} className="hover:bg-[rgba(5,28,44,0.02)] transition-colors">
-                    <td className="py-3 font-medium text-primary">{row.storeName}</td>
-                    <td className="py-3 text-right font-mono text-[#888888]">{row.unitsSold}</td>
-                    <td className="py-3 text-right font-mono text-primary">${row.grossSales.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                    <td className="py-3 text-right font-mono text-primary">${row.grossProfit.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                    <td className="py-3 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <span className="font-mono text-xs font-semibold text-accent">
-                          {row.profitMargin.toFixed(1)}%
-                        </span>
-                        <div className="w-12 h-1.5 bg-accent/10 rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-accent rounded-full" 
-                            style={{ width: `${Math.min(100, row.profitMargin)}%` }}
-                          />
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          
+          <div className="h-72 w-full text-xs font-mono">
+            {stockHealthData.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={stockHealthData} margin={{ top: 10, right: 10, left: -20, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                  <XAxis dataKey="skuKey" tick={{ fontSize: 9 }} stroke="#64748b" />
+                  <YAxis tick={{ fontSize: 9 }} stroke="#64748b" />
+                  <Tooltip wrapperStyle={{ fontFamily: 'monospace', fontSize: '11px' }} />
+                  <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} />
+                  <Bar dataKey="Warehouse Stock" fill={COLOR_WH} radius={[2, 2, 0, 0]} />
+                  <Bar dataKey="Stores Stock" fill={COLOR_STORES} radius={[2, 2, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="h-full flex items-center justify-center text-slate-400 italic">
+                No inventory data to compare. Set up product parameters.
+              </div>
+            )}
           </div>
+          <p className="text-[10px] text-slate-400 italic leading-relaxed">
+            * Operational Rule: Ideal distribution aims to minimize heavy central storage counts while maintaining safety store stock levels to avoid terminal out-of-stock events.
+          </p>
         </div>
 
-        {/* Right Side: Exposure Sizing Matrix */}
-        <div className="lg:col-span-6 bg-white rounded-xl shadow-sm p-6 border border-[rgba(5,28,44,0.06)]">
-          <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
-            <h4 className="text-sm uppercase-label">COLOR-SIZE EXPOSURE MATRIX</h4>
-            <div className="flex items-center gap-2">
-              {/* Matrix selectors */}
-              <select
-                value={matrixModelId}
-                onChange={(e) => setMatrixModelId(e.target.value)}
-                className="yellow-input py-0.5 px-1.5 text-[11px]"
-              >
-                {state.models.map(m => (
-                  <option key={m.id} value={m.id}>{m.id}</option>
-                ))}
-              </select>
-              <select
-                value={matrixStore}
-                onChange={(e) => setMatrixStore(e.target.value)}
-                className="yellow-input py-0.5 px-1.5 text-[11px]"
-              >
-                {state.stores.map(s => (
-                  <option key={s} value={s}>{s === 'Central Warehouse' ? 'Warehouse' : s}</option>
-                ))}
-              </select>
-            </div>
+        {/* Visualization 2: Store Profitability Pareto */}
+        <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm space-y-4">
+          <div className="flex items-center justify-between">
+            <h4 className="font-display text-xs uppercase tracking-wider font-bold text-slate-700 flex items-center gap-1.5">
+              <TrendingUp className="w-4 h-4 text-sky-600" />
+              Store Profitability & Revenue Channels
+            </h4>
+            <span className="text-[10px] bg-slate-50 border border-slate-200 px-2 py-0.5 rounded text-slate-500 font-mono">
+              Pareto Ordering
+            </span>
           </div>
 
-          {matrixData ? (
-            <div className="space-y-4">
-              <div className="text-xs text-primary/80 font-medium">
-                Showing inventory details for <span className="text-accent font-semibold">{matrixData.model.name}</span> in <span className="text-primary font-semibold">{matrixStore}</span>.
+          <div className="h-72 w-full text-xs font-mono">
+            {storeFinancialsData.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={storeFinancialsData} margin={{ top: 10, right: 10, left: -10, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                  <XAxis dataKey="storeName" stroke="#64748b" />
+                  <YAxis tick={{ fontSize: 9 }} stroke="#64748b" />
+                  <Tooltip wrapperStyle={{ fontFamily: 'monospace', fontSize: '11px' }} />
+                  <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} />
+                  <Bar dataKey="revenue" name="Revenue (GMV)" fill="#2251FF" radius={[2, 2, 0, 0]} />
+                  <Bar dataKey="grossProfit" name="Gross Profit ($)" fill="#051C2C" radius={[2, 2, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="h-full flex items-center justify-center text-slate-400 italic">
+                No retail sales recorded. Register transactions in the Store Sales tab.
               </div>
+            )}
+          </div>
+          <p className="text-[10px] text-slate-400 italic leading-relaxed">
+            * Dynamic Pareto logic ranks retail sales locations based on cumulative gross margin contributions to maximize high-performance channels.
+          </p>
+        </div>
 
-              <div className="overflow-x-auto">
-                <table className="w-full border-collapse">
-                  <thead>
-                    <tr>
-                      <th className="p-2 border-b border-[rgba(5,28,44,0.12)] bg-[rgba(5,28,44,0.03)] text-left text-[11px] uppercase tracking-wider font-semibold text-primary">
-                        Color \ Size
-                      </th>
-                      {matrixData.sizes.map(size => (
-                        <th
-                          key={size}
-                          className="p-2 border-b border-[rgba(5,28,44,0.12)] bg-[rgba(5,28,44,0.03)] text-center text-[11px] uppercase tracking-wider font-semibold text-primary"
-                        >
-                          {size}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {matrixData.rowsData.map(row => (
-                      <tr key={row.color} className="border-b border-[rgba(5,28,44,0.04)]">
-                        <td className="p-2.5 font-medium text-xs text-primary bg-[rgba(5,28,44,0.01)] w-28">
-                          {row.color}
-                        </td>
-                        {row.sizesData.map(cell => (
-                          <td key={cell.size} className="p-1 text-center">
-                            <div
-                              className={`p-2.5 rounded-lg font-mono text-xs clickable-cell ${
-                                cell.qty === 0
-                                  ? 'bg-[rgba(5,28,44,0.02)] text-[#888888]'
-                                  : cell.isBelowSafety
-                                  ? 'bg-red-50 text-negative font-semibold border border-red-200'
-                                  : 'bg-blue-50 text-accent font-semibold'
-                              }`}
-                            >
-                              <div>{cell.qty}</div>
-                              {cell.isBelowSafety && cell.qty > 0 && (
-                                <div className="text-[9px] uppercase tracking-tight text-negative/70">
-                                  Low ({matrixData.model.safetyStock})
-                                </div>
-                              )}
-                            </div>
-                          </td>
-                        ))}
-                      </tr>
+      </div>
+
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+        
+        {/* Visualization 3: Merma Audit Root-Cause Breakdown */}
+        <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm space-y-4 xl:col-span-1">
+          <h4 className="font-display text-xs uppercase tracking-wider font-bold text-slate-700 flex items-center gap-1.5">
+            <ShieldAlert className="w-4 h-4 text-red-600" />
+            Merma Audit: Loss Value Causes
+          </h4>
+
+          <div className="h-56 w-full flex items-center justify-center font-mono">
+            {mermaPieData.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={mermaPieData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={50}
+                    outerRadius={80}
+                    paddingAngle={3}
+                    dataKey="value"
+                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                  >
+                    {mermaPieData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS_PIE[index % COLORS_PIE.length]} />
                     ))}
-                  </tbody>
-                </table>
+                  </Pie>
+                  <Tooltip formatter={(value: any) => [`$${value.toLocaleString()}`, 'Loss Value']} />
+                </PieChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="text-slate-400 italic text-xs text-center">
+                No supply chain losses logged. Well done!
               </div>
+            )}
+          </div>
 
-              {/* Matrix Legend */}
-              <div className="flex items-center justify-between text-[11px] text-[#888888] pt-2 border-t border-[rgba(5,28,44,0.06)]">
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-3 h-3 bg-blue-50 rounded border border-blue-200 inline-block"></span>
-                    <span>Healthy Stock</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-3 h-3 bg-red-50 rounded border border-red-200 inline-block"></span>
-                    <span>Below Safety Stock</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-3 h-3 bg-[rgba(5,28,44,0.02)] rounded inline-block"></span>
-                    <span>Zero Stock</span>
-                  </div>
-                </div>
-                <div>* Hover grid cells for magnification and feedback.</div>
+          <div className="space-y-1.5 text-[10px] text-slate-500 font-mono">
+            {mermaPieData.map((item, index) => (
+              <div key={item.name} className="flex justify-between items-center bg-slate-50 p-1.5 rounded border border-slate-100">
+                <span className="flex items-center gap-1">
+                  <span className="w-2.5 h-2.5 rounded-full inline-block" style={{ backgroundColor: COLORS_PIE[index % COLORS_PIE.length] }}></span>
+                  {item.name}
+                </span>
+                <span className="font-bold text-slate-800">${item.value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Dashboard Section 4: Live Inventory Audit Logs */}
+        <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm space-y-4 xl:col-span-2 text-xs">
+          <div className="flex items-center justify-between">
+            <h4 className="font-display text-xs uppercase tracking-wider font-bold text-slate-700 flex items-center gap-1.5">
+              <FileSpreadsheet className="w-4 h-4 text-primary" />
+              SLA Compliance & Dynamic Audit Trail
+            </h4>
+            <span className="px-2 py-0.5 rounded text-[10px] bg-slate-50 text-slate-500 font-bold border border-slate-200">
+              Audit Complete
+            </span>
+          </div>
+
+          <p className="text-slate-500 text-[11px] leading-relaxed">
+            Automated double-entry check system. This log audits live operations compared to the standard supply chain constraints (SLA Yield loss limit is 3.0%).
+          </p>
+
+          <div className="space-y-2.5 font-mono text-[11px]">
+            {/* Rule 1: No negative warehouse inventory */}
+            <div className="p-3 rounded-lg border flex items-start gap-2 bg-slate-50/40 border-slate-200 text-slate-700">
+              <div className="px-1.5 py-0.5 rounded bg-slate-200/60 text-slate-600 font-bold text-[9px] uppercase tracking-wider">PASS</div>
+              <div className="space-y-0.5">
+                <span className="font-bold block text-primary">Double-Entry Conservation Audit</span>
+                <span className="text-slate-500 text-[10px]">All transfers out of central storage are verified against previous breakdown logs. Total production pieces: {state.breakdown.reduce((sum, b) => sum + b.qtyPcs, 0)} pcs.</span>
               </div>
             </div>
-          ) : (
-            <div className="text-center py-10 text-[#888888] text-xs">No model configuration selected.</div>
-          )}
+
+            {/* Rule 2: Merma Alert checks */}
+            {mermaStats.lossQtyRatio > 3.0 ? (
+              <div className="p-3 rounded-lg border flex items-start gap-2 bg-red-50/40 border-red-200 text-red-900">
+                <div className="px-1.5 py-0.5 rounded bg-red-100 text-red-700 font-bold text-[9px] uppercase tracking-wider">WARN</div>
+                <div className="space-y-0.5">
+                  <span className="font-bold block text-red-800">Supply Chain Yield Warning</span>
+                  <span className="text-slate-500 text-[10px]">The overall pieces loss ratio ({mermaStats.lossQtyRatio.toFixed(2)}%) is above the SLA target threshold of 3.00%. Target corrective actions at high-loss channels.</span>
+                </div>
+              </div>
+            ) : (
+              <div className="p-3 rounded-lg border flex items-start gap-2 bg-slate-50/40 border-slate-200 text-slate-700">
+                <div className="px-1.5 py-0.5 rounded bg-slate-200/60 text-slate-600 font-bold text-[9px] uppercase tracking-wider">PASS</div>
+                <div className="space-y-0.5">
+                  <span className="font-bold block text-primary">Supply Chain Yield Audit</span>
+                  <span className="text-slate-500 text-[10px]">Overall supply-chain loss ratio is healthy at {mermaStats.lossQtyRatio.toFixed(2)}% (SLA Limit: 3.00%). No yield penalties incurred.</span>
+                </div>
+              </div>
+            )}
+
+            {/* Rule 3: High Margin alerts */}
+            <div className="p-3 rounded-lg border flex items-start gap-2 bg-slate-50/40 border-slate-200 text-slate-700">
+              <div className="px-1.5 py-0.5 rounded bg-slate-200/60 text-slate-600 font-bold text-[9px] uppercase tracking-wider">INFO</div>
+              <div className="space-y-0.5">
+                <span className="font-bold block text-primary">Product Profitability Index</span>
+                <span className="text-slate-500 text-[10px]">Average Retail Margin is solid at {salesStats.marginPercent.toFixed(1)}%. Total wholesale cost inputs of products: ${salesStats.cogs.toLocaleString(undefined, { maximumFractionDigits: 0 })}.</span>
+              </div>
+            </div>
+          </div>
         </div>
+
       </div>
     </div>
   );

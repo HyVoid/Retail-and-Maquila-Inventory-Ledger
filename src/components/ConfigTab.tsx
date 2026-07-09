@@ -1,222 +1,345 @@
 import React, { useState } from 'react';
-import { LedgerState, ModelConfig } from '../types';
-import { Plus, Check, Info } from 'lucide-react';
+import { LedgerState, ProductMaster } from '../types';
+import { Plus, Trash2, Key, Settings, Layers, HelpCircle } from 'lucide-react';
 
 interface ConfigTabProps {
   state: LedgerState;
-  onChangeModels: (newModels: ModelConfig[]) => void;
   onAddStore: (storeName: string) => void;
+  onAddWasteType: (wasteType: string) => void;
+  onAddProduct: (product: ProductMaster) => void;
+  onDeleteProduct: (skuKey: string) => void;
+  onUpdateProductCost: (skuKey: string, newCost: number) => void;
 }
 
-export default function ConfigTab({ state, onChangeModels, onAddStore }: ConfigTabProps) {
-  const [newStoreName, setNewStoreName] = useState('');
-  const [storeError, setStoreError] = useState('');
-  const [storeSuccess, setStoreSuccess] = useState(false);
+export default function ConfigTab({
+  state,
+  onAddStore,
+  onAddWasteType,
+  onAddProduct,
+  onDeleteProduct,
+  onUpdateProductCost
+}: ConfigTabProps) {
+  // Parameters states
+  const [newStore, setNewStore] = useState('');
+  const [newWaste, setNewWaste] = useState('');
 
-  // Handle Model Changes
-  const handleModelFieldChange = (modelId: string, field: keyof ModelConfig, value: any) => {
-    const updatedModels = state.models.map(m => {
-      if (m.id === modelId) {
-        let parsedValue = value;
-        if (field === 'unitCost' || field === 'unitPrice' || field === 'safetyStock') {
-          parsedValue = parseFloat(value) || 0;
-        }
-        return { ...m, [field]: parsedValue };
-      }
-      return m;
-    });
-    onChangeModels(updatedModels);
-  };
+  // Product Master form states
+  const [newModel, setNewModel] = useState('');
+  const [newColor, setNewColor] = useState('');
+  const [newSize, setNewSize] = useState('M');
+  const [newUnit, setNewUnit] = useState('Pcs');
+  const [newCostPrice, setNewCostPrice] = useState<number>(15.00);
 
-  // Add new store
+  // Form handlers
   const handleAddStoreSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setStoreError('');
-    setStoreSuccess(false);
-
-    const trimmed = newStoreName.trim();
-    if (!trimmed) {
-      setStoreError('Store name cannot be empty.');
+    if (!newStore.trim()) return;
+    if (state.params.stores.includes(newStore.trim())) {
+      alert("Store already exists!");
       return;
     }
-    if (state.stores.includes(trimmed)) {
-      setStoreError('A store with this name already exists.');
+    onAddStore(newStore.trim());
+    setNewStore('');
+  };
+
+  const handleAddWasteSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newWaste.trim()) return;
+    if (state.params.wasteTypes.includes(newWaste.trim())) {
+      alert("Waste type already exists!");
+      return;
+    }
+    onAddWasteType(newWaste.trim());
+    setNewWaste('');
+  };
+
+  const handleAddProductSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const model = newModel.trim().toUpperCase();
+    const color = newColor.trim();
+    const size = newSize.trim().toUpperCase();
+    if (!model || !color || !size) {
+      alert("Please fill in all SKU fields.");
       return;
     }
 
-    onAddStore(trimmed);
-    setNewStoreName('');
-    setStoreSuccess(true);
-    setTimeout(() => setStoreSuccess(false), 3000);
+    const skuKey = `${model}-${color}-${size}`;
+    if (state.products.some(p => p.skuKey === skuKey)) {
+      alert("SKU already exists in Product Master!");
+      return;
+    }
+
+    const newProd: ProductMaster = {
+      model,
+      color,
+      size,
+      skuKey,
+      unit: newUnit,
+      costPrice: newCostPrice
+    };
+
+    onAddProduct(newProd);
+    // Reset fields except model and color for faster sequence entry
+    setNewSize('M');
   };
 
   return (
     <div className="space-y-8 animate-fade-up">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      {/* Parameters Layer (tbl_Params) */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         
-        {/* Left Side: Store Channels Management */}
-        <div className="lg:col-span-1 bg-white rounded-xl shadow-sm p-6 border border-[rgba(5,28,44,0.06)] h-fit">
-          <h4 className="text-sm uppercase-label mb-4">RETAIL & WAREHOUSE CHANNELS</h4>
-          
+        {/* Stores Configuration */}
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Settings className="w-4 h-4 text-accent" />
+            <h3 className="font-display text-base font-bold text-primary uppercase tracking-tight">
+              Parameters: Store Channels List (tbl_Params)
+            </h3>
+          </div>
+          <p className="text-xs text-slate-500 mb-4">
+            These stores are dynamic targets for distribution transfers and terminal retail sales. "Warehouse" is designated as the primary logistics fulfillment center.
+          </p>
+
           <div className="space-y-4">
-            <div className="space-y-2">
-              <span className="text-[11px] font-semibold text-[#888888] uppercase tracking-wider block">Current Channels</span>
-              <div className="divide-y divide-[rgba(5,28,44,0.06)] border border-[rgba(5,28,44,0.06)] rounded-lg overflow-hidden bg-slate-50">
-                {state.stores.map((store, i) => (
-                  <div key={store} className="px-3 py-2 flex items-center justify-between text-xs">
-                    <span className="font-medium text-primary">{store}</span>
-                    <span className="text-[10px] bg-slate-200 text-primary/70 px-2 py-0.5 rounded-full font-mono">
-                      {i === 0 ? 'HQ Warehouse' : `Retail Store ${i}`}
-                    </span>
-                  </div>
-                ))}
-              </div>
+            <div className="flex flex-wrap gap-2">
+              {state.params.stores.map(store => (
+                <span
+                  key={store}
+                  className={`px-3 py-1 rounded-full text-xs font-semibold border ${
+                    store === "Warehouse"
+                      ? "bg-primary text-white border-primary"
+                      : "bg-slate-50 text-slate-700 border-slate-200"
+                  }`}
+                >
+                  {store} {store === "Warehouse" && "⭐"}
+                </span>
+              ))}
             </div>
 
-            <form onSubmit={handleAddStoreSubmit} className="space-y-3 pt-2 border-t border-[rgba(5,28,44,0.06)]">
-              <span className="text-[11px] font-semibold text-[#888888] uppercase tracking-wider block">Add New Retail Store</span>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  placeholder="e.g. Store Delta"
-                  value={newStoreName}
-                  onChange={(e) => setNewStoreName(e.target.value)}
-                  className="yellow-input flex-1 py-1.5"
-                />
-                <button
-                  type="submit"
-                  className="bg-accent hover:bg-accent/90 text-white px-3 py-1.5 rounded-md flex items-center gap-1 font-semibold text-xs transition-colors cursor-pointer"
-                >
-                  <Plus className="w-4 h-4" />
-                  <span>Add</span>
-                </button>
-              </div>
-              {storeError && <p className="text-xs text-negative font-medium">{storeError}</p>}
-              {storeSuccess && <p className="text-xs text-positive font-medium flex items-center gap-1"><Check className="w-3.5 h-3.5" /> Store added successfully!</p>}
+            <form onSubmit={handleAddStoreSubmit} className="flex gap-2">
+              <input
+                type="text"
+                placeholder="e.g., Store C"
+                value={newStore}
+                onChange={(e) => setNewStore(e.target.value)}
+                className="yellow-input flex-1 py-1.5 px-3 text-xs"
+                required
+              />
+              <button
+                type="submit"
+                className="bg-primary hover:bg-primary/90 text-white px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1 shrink-0 cursor-pointer"
+              >
+                <Plus className="w-3.5 h-3.5" /> Add Store
+              </button>
             </form>
           </div>
         </div>
 
-        {/* Right Side: Models Spreadsheet */}
-        <div className="lg:col-span-2 bg-white rounded-xl shadow-sm p-6 border border-[rgba(5,28,44,0.06)]">
-          <div className="flex items-center justify-between mb-2">
-            <h4 className="text-sm uppercase-label">MODEL CONFIGURATION SHEET</h4>
-            <span className="text-[11px] text-[#888888] flex items-center gap-1">
-              <Info className="w-3 h-3" />
-              Editable inputs are marked in pale yellow
-            </span>
+        {/* Waste Types Configuration */}
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Layers className="w-4 h-4 text-accent" />
+            <h3 className="font-display text-base font-bold text-primary uppercase tracking-tight">
+              Parameters: Waste Reason Codes (tbl_Params)
+            </h3>
           </div>
-          <p className="text-xs text-[#888888] mb-4">
-            Changes made here instantly propagate across all margins, sales yields, and safety alerts in real-time.
+          <p className="text-xs text-slate-500 mb-4">
+            Used to classify inventory material loss or write-offs (Merma) across the entire supply chain.
           </p>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead>
-                <tr className="border-b-2 border-[#051C2C]">
-                  <th className="py-2.5 uppercase font-semibold text-[11px] text-primary w-14">Code</th>
-                  <th className="py-2.5 uppercase font-semibold text-[11px] text-primary">Model Name</th>
-                  <th className="py-2.5 uppercase font-semibold text-[11px] text-primary w-24">Category</th>
-                  <th className="py-2.5 text-right uppercase font-semibold text-[11px] text-primary w-20">Cost ($)</th>
-                  <th className="py-2.5 text-right uppercase font-semibold text-[11px] text-primary w-20">Price ($)</th>
-                  <th className="py-2.5 text-right uppercase font-semibold text-[11px] text-primary w-16">Safety</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[rgba(5,28,44,0.06)]">
-                {state.models.map((model) => (
-                  <tr key={model.id} className="hover:bg-[rgba(5,28,44,0.01)] transition-colors">
-                    <td className="py-3 font-mono font-bold text-primary">{model.id}</td>
-                    <td className="py-2 px-1">
-                      <input
-                        type="text"
-                        value={model.name}
-                        onChange={(e) => handleModelFieldChange(model.id, 'name', e.target.value)}
-                        className="yellow-input w-full py-1 text-xs"
-                      />
-                    </td>
-                    <td className="py-2 px-1">
-                      <input
-                        type="text"
-                        value={model.category}
-                        onChange={(e) => handleModelFieldChange(model.id, 'category', e.target.value)}
-                        className="yellow-input w-full py-1 text-xs"
-                      />
-                    </td>
-                    <td className="py-2 px-1 text-right">
-                      <div className="flex items-center justify-end">
-                        <span className="text-[#888888] mr-1">$</span>
-                        <input
-                          type="number"
-                          step="0.01"
-                          value={model.unitCost}
-                          onChange={(e) => handleModelFieldChange(model.id, 'unitCost', e.target.value)}
-                          className="yellow-input w-16 py-1 text-right text-xs font-mono"
-                        />
-                      </div>
-                    </td>
-                    <td className="py-2 px-1 text-right">
-                      <div className="flex items-center justify-end">
-                        <span className="text-[#888888] mr-1">$</span>
-                        <input
-                          type="number"
-                          step="0.01"
-                          value={model.unitPrice}
-                          onChange={(e) => handleModelFieldChange(model.id, 'unitPrice', e.target.value)}
-                          className="yellow-input w-16 py-1 text-right text-xs font-mono"
-                        />
-                      </div>
-                    </td>
-                    <td className="py-2 px-1 text-right">
-                      <input
-                        type="number"
-                        value={model.safetyStock}
-                        onChange={(e) => handleModelFieldChange(model.id, 'safetyStock', e.target.value)}
-                        className="yellow-input w-12 py-1 text-center text-xs font-mono"
-                      />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="space-y-4">
+            <div className="flex flex-wrap gap-2">
+              {state.params.wasteTypes.map(type => (
+                <span
+                  key={type}
+                  className="px-3 py-1 rounded-full text-xs font-semibold bg-red-50 text-red-700 border border-red-100"
+                >
+                  {type}
+                </span>
+              ))}
+            </div>
+
+            <form onSubmit={handleAddWasteSubmit} className="flex gap-2">
+              <input
+                type="text"
+                placeholder="e.g., Water Damage"
+                value={newWaste}
+                onChange={(e) => setNewWaste(e.target.value)}
+                className="yellow-input flex-1 py-1.5 px-3 text-xs"
+                required
+              />
+              <button
+                type="submit"
+                className="bg-primary hover:bg-primary/90 text-white px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1 shrink-0 cursor-pointer"
+              >
+                <Plus className="w-3.5 h-3.5" /> Add Reason
+              </button>
+            </form>
+          </div>
+        </div>
+
+      </div>
+
+      {/* Product Master Configuration (tbl_Products) */}
+      <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
+          <div className="flex items-center gap-2">
+            <Key className="w-4 h-4 text-accent" />
+            <h3 className="font-display text-base font-bold text-primary uppercase tracking-tight">
+              Product Master & SKU Database (tbl_Products)
+            </h3>
+          </div>
+          <span className="text-[11px] text-slate-500 font-mono flex items-center gap-1.5 bg-slate-50 border border-slate-200 px-3 py-1 rounded-lg">
+            <HelpCircle className="w-3.5 h-3.5 text-accent" />
+            Auto-Formula: SKU_Key = Model & "-" & Color & "-" & Size
+          </span>
+        </div>
+
+        <p className="text-xs text-slate-500 mb-6">
+          This is the single source of truth for standard SKU definitions. Every transaction (Breakdown, Waste, Transfer, Sale) must strictly validate against this SKU Master.
+        </p>
+
+        <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
+          
+          {/* Add SKU Master Form */}
+          <div className="xl:col-span-1 border border-slate-200/80 rounded-xl p-5 bg-slate-50/50 space-y-4">
+            <h4 className="text-xs uppercase tracking-wider font-bold text-primary">Add SKU to Product Master</h4>
+            <form onSubmit={handleAddProductSubmit} className="space-y-3.5 text-xs">
+              <div className="space-y-1">
+                <label className="text-slate-500 font-semibold uppercase tracking-wider block">Model Code</label>
+                <input
+                  type="text"
+                  placeholder="e.g., MD-01"
+                  value={newModel}
+                  onChange={(e) => setNewModel(e.target.value)}
+                  className="yellow-input w-full px-2.5 py-1.5 font-bold"
+                  required
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-slate-500 font-semibold uppercase tracking-wider block">Product Color</label>
+                <input
+                  type="text"
+                  placeholder="e.g., Onyx Black"
+                  value={newColor}
+                  onChange={(e) => setNewColor(e.target.value)}
+                  className="yellow-input w-full px-2.5 py-1.5 font-semibold"
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-slate-500 font-semibold uppercase tracking-wider block">Size</label>
+                  <select
+                    value={newSize}
+                    onChange={(e) => setNewSize(e.target.value)}
+                    className="yellow-input w-full px-2 py-1.5 font-bold"
+                    required
+                  >
+                    <option value="S">S</option>
+                    <option value="M">M</option>
+                    <option value="L">L</option>
+                    <option value="XL">XL</option>
+                  </select>
+                </div>
+                <div className="space-y-1">
+                  <label className="text-slate-500 font-semibold uppercase tracking-wider block">Unit</label>
+                  <input
+                    type="text"
+                    value={newUnit}
+                    onChange={(e) => setNewUnit(e.target.value)}
+                    className="yellow-input w-full px-2 py-1.5 text-center font-semibold"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-slate-500 font-semibold uppercase tracking-wider block">Cost Price ($ / Piece)</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  value={newCostPrice}
+                  onChange={(e) => setNewCostPrice(parseFloat(e.target.value) || 0)}
+                  className="yellow-input w-full px-2.5 py-1.5 font-mono font-bold"
+                  required
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="bg-primary hover:bg-primary/95 text-white w-full py-2 rounded-lg font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer uppercase tracking-wider"
+              >
+                <Plus className="w-4 h-4" /> Register SKU
+              </button>
+            </form>
           </div>
 
-          {/* Model Ratios Summary Cards */}
-          <div className="mt-8 pt-6 border-t border-[rgba(5,28,44,0.1)] space-y-4">
-            <h5 className="text-xs uppercase-label text-[#888888]">MODEL PACKING RATIO TEMPLATES</h5>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {state.models.map(m => (
-                <div key={m.id} className="p-3.5 bg-slate-50 rounded-lg border border-[rgba(5,28,44,0.06)] space-y-2 text-xs">
-                  <div className="flex justify-between items-center font-semibold text-primary">
-                    <span>{m.id} - {m.name}</span>
-                    <span className="text-[10px] bg-accent/10 text-accent px-1.5 py-0.5 rounded uppercase">{m.category}</span>
-                  </div>
-                  <div>
-                    <span className="text-[10px] uppercase text-[#888888] tracking-wider block">Sizes Distribution:</span>
-                    <div className="flex gap-2 font-mono text-[11px] text-primary/80 mt-1 flex-wrap">
-                      {Object.entries(m.sizeDistribution).map(([size, r]) => (
-                        <span key={size} className="bg-white border border-[rgba(5,28,44,0.06)] px-1.5 py-0.5 rounded">
-                          {size}: {(r * 100).toFixed(0)}%
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <span className="text-[10px] uppercase text-[#888888] tracking-wider block">Colors Distribution:</span>
-                    <div className="flex gap-2 font-mono text-[11px] text-primary/80 mt-1 flex-wrap">
-                      {Object.entries(m.colorDistribution).map(([color, r]) => (
-                        <span key={color} className="bg-white border border-[rgba(5,28,44,0.06)] px-1.5 py-0.5 rounded">
-                          {color}: {(r * 100).toFixed(0)}%
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              ))}
+          {/* Master SKU List Spreadsheet */}
+          <div className="xl:col-span-3">
+            <div className="overflow-x-auto max-h-[480px] overflow-y-auto border border-slate-200 rounded-lg">
+              <table className="w-full text-left text-xs">
+                <thead className="sticky top-0 bg-slate-50 shadow-sm border-b border-slate-200 z-10">
+                  <tr>
+                    <th className="p-3 text-primary font-bold uppercase tracking-wider">Model</th>
+                    <th className="p-3 text-primary font-bold uppercase tracking-wider">Color</th>
+                    <th className="p-3 text-primary font-bold uppercase tracking-wider text-center">Size</th>
+                    <th className="p-3 text-primary font-bold uppercase tracking-wider font-mono">SKU_Key (Key)</th>
+                    <th className="p-3 text-primary font-bold uppercase tracking-wider text-center">Unit</th>
+                    <th className="p-3 text-primary font-bold uppercase tracking-wider text-right w-36">Cost Price ($)</th>
+                    <th className="p-3 text-primary font-bold uppercase tracking-wider text-center w-16">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 bg-white">
+                  {state.products.map(prod => (
+                    <tr key={prod.skuKey} className="hover:bg-slate-50/50 transition-colors">
+                      <td className="p-3 font-bold text-primary font-mono">{prod.model}</td>
+                      <td className="p-3 text-slate-700 font-medium">{prod.color}</td>
+                      <td className="p-3 text-center text-slate-500 font-bold font-mono">{prod.size}</td>
+                      <td className="p-3 font-mono font-semibold text-slate-900 bg-slate-50/40">{prod.skuKey}</td>
+                      <td className="p-3 text-center text-slate-500">{prod.unit}</td>
+                      <td className="p-2 text-right">
+                        <div className="flex items-center justify-end">
+                          <span className="text-slate-400 font-semibold mr-1">$</span>
+                          <input
+                            type="number"
+                            step="0.01"
+                            value={prod.costPrice}
+                            onChange={(e) => onUpdateProductCost(prod.skuKey, parseFloat(e.target.value) || 0)}
+                            className="yellow-input py-0.5 px-1 w-20 text-right font-mono font-bold"
+                          />
+                        </div>
+                      </td>
+                      <td className="p-2 text-center">
+                        <button
+                          onClick={() => {
+                            if (window.confirm(`Are you sure you want to delete SKU ${prod.skuKey} from Product Master?`)) {
+                              onDeleteProduct(prod.skuKey);
+                            }
+                          }}
+                          className="text-red-500 hover:text-red-700 p-1.5 rounded hover:bg-red-50 transition-colors cursor-pointer"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                  {state.products.length === 0 && (
+                    <tr>
+                      <td colSpan={7} className="text-center py-8 text-slate-400 italic">Product Master database is empty.</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+            <div className="mt-2 text-[10px] text-slate-400 font-sans italic text-right">
+              * Note: Double-click or select yellow cells to override Cost_Price. Changes will dynamically propagate across all engines and sheets.
             </div>
           </div>
 
         </div>
-
       </div>
     </div>
   );

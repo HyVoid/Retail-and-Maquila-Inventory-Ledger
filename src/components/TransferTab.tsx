@@ -1,92 +1,104 @@
 import React, { useState, useMemo } from 'react';
-import { LedgerState, TransferLog } from '../types';
-import { SkuInventoryRow } from '../utils/inventory';
-import { Plus, Check, ArrowLeftRight, AlertTriangle } from 'lucide-react';
+import { LedgerState, WarehouseTransfer } from '../types';
+import { CombinedInventoryRow } from '../utils/inventory';
+import { Plus, Trash2, ArrowLeftRight, HelpCircle, Check, Download } from 'lucide-react';
 
 interface TransferTabProps {
   state: LedgerState;
-  skuRows: SkuInventoryRow[];
-  onAddTransfer: (transfer: TransferLog) => void;
+  skuInventory: CombinedInventoryRow[];
+  onAddTransfer: (transfer: WarehouseTransfer) => void;
+  onDeleteTransfer: (transferId: string) => void;
 }
 
-export default function TransferTab({ state, skuRows, onAddTransfer }: TransferTabProps) {
-  // Transfer Form State
+export default function TransferTab({ state, skuInventory, onAddTransfer, onDeleteTransfer }: TransferTabProps) {
+  // Form State
   const [date, setDate] = useState('2026-07-01');
+  const [destStore, setDestStore] = useState('');
   const [selectedSkuKey, setSelectedSkuKey] = useState('');
-  const [sourceStore, setSourceStore] = useState('Central Warehouse');
-  const [destStore, setDestStore] = useState('Store Alpha');
-  const [quantity, setQuantity] = useState<number>(10);
-
-  const [formError, setFormError] = useState('');
+  const [qtyPcs, setQtyPcs] = useState<number>(10);
   const [formSuccess, setFormSuccess] = useState(false);
 
-  // Available SKUs based on models list
-  const availableSkus = useMemo(() => {
-    return skuRows.map(r => ({
-      key: r.skuKey,
-      name: `${r.skuKey} (${r.modelName} - ${r.color}, size ${r.size})`
-    }));
-  }, [skuRows]);
+  const handleExportCSV = () => {
+    if (state.transfers.length === 0) {
+      alert("No transfers available to export.");
+      return;
+    }
+    const headers = ["Transfer_ID", "Date", "Source_Loc", "Dest_Store", "SKU_Key", "Qty_Pcs"];
+    const csvRows = [
+      headers.join(","),
+      ...state.transfers.map(row => [
+        `"${row.transferId}"`,
+        `"${row.date}"`,
+        `"${row.sourceLoc}"`,
+        `"${row.destStore}"`,
+        `"${row.skuKey}"`,
+        row.qtyPcs
+      ].join(","))
+    ];
+    const csvContent = "\uFEFF" + csvRows.join("\n");
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", `tbl_transfers_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
-  // Set initial SKU when SKUs load
+  // Filter retail stores for destination
+  const retailStores = useMemo(() => {
+    return state.params.stores.filter(s => s !== "Warehouse");
+  }, [state.params.stores]);
+
+  // Set initial store
   React.useEffect(() => {
-    if (availableSkus.length > 0 && !selectedSkuKey) {
-      setSelectedSkuKey(availableSkus[0].key);
+    if (retailStores.length > 0 && !destStore) {
+      setDestStore(retailStores[0]);
     }
-  }, [availableSkus, selectedSkuKey]);
+  }, [retailStores, destStore]);
 
-  // Get current stock at source for selected SKU to show in form
-  const sourceStockOnHand = useMemo(() => {
-    if (!selectedSkuKey) return 0;
-    const matched = skuRows.find(r => r.skuKey === selectedSkuKey);
-    return matched ? matched.stockByStore[sourceStore] || 0 : 0;
-  }, [selectedSkuKey, sourceStore, skuRows]);
+  // Set initial SKU
+  React.useEffect(() => {
+    if (state.products.length > 0 && !selectedSkuKey) {
+      setSelectedSkuKey(state.products[0].skuKey);
+    }
+  }, [state.products, selectedSkuKey]);
 
-  // Handle Submit
-  const handleTransferSubmit = (e: React.FormEvent) => {
+  // Fetch current stock on hand at source Warehouse to show in form
+  const warehouseStockOnHand = useMemo(() => {
+    const matched = skuInventory.find(item => item.skuKey === selectedSkuKey);
+    return matched ? matched.whStock : 0;
+  }, [selectedSkuKey, skuInventory]);
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setFormError('');
-    setFormSuccess(false);
-
-    if (!selectedSkuKey) {
-      setFormError('Please select a SKU to transfer.');
+    if (!selectedSkuKey) return;
+    if (!destStore) {
+      alert("Please configure a retail destination store first.");
       return;
     }
 
-    if (sourceStore === destStore) {
-      setFormError('Source location and Destination location must be different.');
-      return;
+    if (qtyPcs > warehouseStockOnHand) {
+      const proceed = window.confirm(
+        `Warning (Section 7.2): Warehouse stock has only ${warehouseStockOnHand} units of ${selectedSkuKey}. Posting this will result in a negative stock count on calculations. Do you want to proceed for ledger consistency?`
+      );
+      if (!proceed) return;
     }
 
-    if (quantity <= 0) {
-      setFormError('Transfer quantity must be greater than zero.');
-      return;
-    }
-
-    // Verify stock availability
-    if (quantity > sourceStockOnHand) {
-      setFormError(`Insufficient stock! ${sourceStore} only has ${sourceStockOnHand} units of ${selectedSkuKey} available.`);
-      return;
-    }
-
-    const matchedSku = skuRows.find(r => r.skuKey === selectedSkuKey);
-    if (!matchedSku) return;
-
-    const newTransfer: TransferLog = {
-      id: `TR-${Date.now().toString().slice(-4)}`,
+    const transferId = `TR-${Date.now().toString().slice(-3)}`;
+    const newTransfer: WarehouseTransfer = {
+      transferId,
       date,
+      sourceLoc: "Warehouse",
+      destStore,
       skuKey: selectedSkuKey,
-      modelId: matchedSku.modelId,
-      color: matchedSku.color,
-      size: matchedSku.size,
-      source: sourceStore,
-      destination: destStore,
-      quantity
+      qtyPcs
     };
 
     onAddTransfer(newTransfer);
     setFormSuccess(true);
-    setQuantity(10);
+    setQtyPcs(10);
     setTimeout(() => setFormSuccess(false), 3000);
   };
 
@@ -94,49 +106,52 @@ export default function TransferTab({ state, skuRows, onAddTransfer }: TransferT
     <div className="space-y-8 animate-fade-up">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
-        {/* Left Column: Log Transfer Form */}
-        <div className="lg:col-span-1 bg-white rounded-xl shadow-sm p-6 border border-[rgba(5,28,44,0.06)] h-fit">
-          <h4 className="text-sm uppercase-label mb-4">DISPATCH STOCK TRANSFER</h4>
+        {/* Left Column: Register Transfer Form */}
+        <div className="lg:col-span-1 bg-white rounded-xl border border-slate-200 shadow-sm p-6 h-fit text-xs space-y-4">
+          <div className="flex items-center gap-2">
+            <ArrowLeftRight className="w-4 h-4 text-accent" />
+            <h3 className="font-display text-base font-bold text-primary uppercase tracking-tight">
+              Post Transfer (tbl_Transfers)
+            </h3>
+          </div>
+          <p className="text-xs text-slate-500">
+            Log cargo transportations dispatching from Warehouse to other stores. Under the Law of Conservation of Stock, quantities will be subtracted from Warehouse and added to the selected retail destination.
+          </p>
 
-          <form onSubmit={handleTransferSubmit} className="space-y-4">
-            
-            {/* Date */}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Transfer Date */}
             <div className="space-y-1">
-              <label className="text-xs text-[#888888] font-medium uppercase tracking-wider block">Transfer Date</label>
+              <label className="text-slate-500 font-semibold uppercase tracking-wider block">Transfer Date</label>
               <input
                 type="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="yellow-input w-full"
+                className="yellow-input w-full font-medium"
                 required
               />
             </div>
 
-            {/* Source Location */}
+            {/* Source Store */}
             <div className="space-y-1">
-              <label className="text-xs text-[#888888] font-medium uppercase tracking-wider block">From (Source Store)</label>
-              <select
-                value={sourceStore}
-                onChange={(e) => setSourceStore(e.target.value)}
-                className="yellow-input w-full"
-                required
-              >
-                {state.stores.map(s => (
-                  <option key={s} value={s}>{s}</option>
-                ))}
-              </select>
+              <label className="text-slate-500 font-semibold uppercase tracking-wider block">Source Store (Fixed)</label>
+              <input
+                type="text"
+                value="Warehouse"
+                className="yellow-input w-full font-bold bg-slate-50 border-slate-200 text-slate-400 cursor-not-allowed text-center"
+                disabled
+              />
             </div>
 
-            {/* Destination Location */}
+            {/* Retail store destination */}
             <div className="space-y-1">
-              <label className="text-xs text-[#888888] font-medium uppercase tracking-wider block">To (Destination Store)</label>
+              <label className="text-slate-500 font-semibold uppercase tracking-wider block">Destination Retail Store</label>
               <select
                 value={destStore}
                 onChange={(e) => setDestStore(e.target.value)}
-                className="yellow-input w-full"
+                className="yellow-input w-full font-semibold"
                 required
               >
-                {state.stores.map(s => (
+                {retailStores.map(s => (
                   <option key={s} value={s}>{s}</option>
                 ))}
               </select>
@@ -144,102 +159,116 @@ export default function TransferTab({ state, skuRows, onAddTransfer }: TransferT
 
             {/* SKU selection */}
             <div className="space-y-1">
-              <label className="text-xs text-[#888888] font-medium uppercase tracking-wider block">Select Item SKU</label>
+              <label className="text-slate-500 font-semibold uppercase tracking-wider block">Select Item SKU</label>
               <select
                 value={selectedSkuKey}
                 onChange={(e) => setSelectedSkuKey(e.target.value)}
-                className="yellow-input w-full font-mono text-xs"
+                className="yellow-input w-full font-mono text-xs font-bold"
                 required
               >
-                {availableSkus.map(item => (
-                  <option key={item.key} value={item.key}>{item.name}</option>
+                {state.products.map(p => (
+                  <option key={p.skuKey} value={p.skuKey}>{p.skuKey}</option>
                 ))}
               </select>
             </div>
 
-            {/* Stock on hand helper preview */}
-            <div className="p-3 bg-slate-50 rounded-lg flex justify-between items-center text-xs">
-              <span className="text-[#888888] font-medium">STOCK ON HAND AT SOURCE:</span>
-              <span className={`font-mono font-bold text-sm ${sourceStockOnHand === 0 ? 'text-negative' : 'text-primary'}`}>
-                {sourceStockOnHand} pcs
+            {/* Available stock at source preview */}
+            <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg flex justify-between items-center text-[11px] font-mono">
+              <span className="text-slate-500 font-semibold uppercase tracking-wider text-[10px]">Stock at Warehouse:</span>
+              <span className={`font-bold ${warehouseStockOnHand === 0 ? 'text-red-500' : 'text-primary'}`}>
+                {warehouseStockOnHand} Pcs
               </span>
             </div>
 
             {/* Quantity */}
             <div className="space-y-1">
-              <label className="text-xs text-[#888888] font-medium uppercase tracking-wider block">Quantity to Transfer</label>
+              <label className="text-slate-500 font-semibold uppercase tracking-wider block">Quantity to Transfer</label>
               <input
                 type="number"
-                value={quantity}
-                onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 0))}
+                value={qtyPcs}
+                onChange={(e) => setQtyPcs(Math.max(1, parseInt(e.target.value) || 0))}
                 className="yellow-input w-full font-mono font-bold"
                 min="1"
                 required
               />
             </div>
 
-            {formError && (
-              <div className="p-3 bg-red-50 rounded text-xs text-negative flex gap-1.5 items-start">
-                <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
-                <span className="font-semibold">{formError}</span>
-              </div>
-            )}
-
             <button
               type="submit"
-              disabled={sourceStockOnHand === 0}
-              className={`w-full py-2.5 rounded-lg font-semibold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-sm ${
-                sourceStockOnHand === 0
-                  ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
-                  : 'bg-primary hover:bg-primary/95 text-white'
-              }`}
+              className="bg-primary hover:bg-primary/95 text-white w-full py-2.5 rounded-lg font-bold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-sm uppercase tracking-wider"
             >
               <ArrowLeftRight className="w-4 h-4" />
-              <span>POST STOCK TRANSFER</span>
+              <span>LOG LOGISTICS TRANSFER</span>
             </button>
 
             {formSuccess && (
-              <p className="text-xs text-positive font-medium flex items-center gap-1 justify-center mt-2 animate-fade-up">
-                <Check className="w-4 h-4" /> Transfer posted successfully.
+              <p className="text-xs text-positive font-medium flex items-center gap-1 justify-center mt-1 animate-fade-up">
+                <Check className="w-4 h-4" /> Transfer posted to ledger!
               </p>
             )}
-
           </form>
         </div>
 
-        {/* Right Column: Historical Logs */}
-        <div className="lg:col-span-2 bg-white rounded-xl shadow-sm p-6 border border-[rgba(5,28,44,0.06)]">
-          <h4 className="text-sm uppercase-label mb-4">STOCK TRANSFER LEDGER</h4>
+        {/* Right Spreadsheet: Transfers Ledger */}
+        <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+          <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
+            <h3 className="font-display text-base font-bold text-primary uppercase tracking-tight">
+              Warehouse Transfers Registry (tbl_Transfers)
+            </h3>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleExportCSV}
+                className="px-3 py-1 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-sm"
+              >
+                <Download className="w-3.5 h-3.5 text-accent" />
+                <span>Export CSV</span>
+              </button>
+              <span className="text-[11px] text-slate-500 font-mono flex items-center gap-1 bg-slate-50 border border-slate-200 px-3 py-1 rounded-lg">
+                <HelpCircle className="w-3.5 h-3.5 text-accent" />
+                Rule: Warehouse subtracts, Dest_Store adds
+              </span>
+            </div>
+          </div>
 
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto border border-slate-200 rounded-lg max-h-[500px] overflow-y-auto">
             <table className="w-full text-left text-xs">
-              <thead>
-                <tr className="border-b-2 border-[#051C2C]">
-                  <th className="py-2.5 uppercase font-semibold text-[11px] text-primary w-20">Log ID</th>
-                  <th className="py-2.5 uppercase font-semibold text-[11px] text-primary w-24">Date</th>
-                  <th className="py-2.5 uppercase font-semibold text-[11px] text-primary">SKU Key</th>
-                  <th className="py-2.5 uppercase font-semibold text-[11px] text-primary">Source Dispatch</th>
-                  <th className="py-2.5 uppercase font-semibold text-[11px] text-primary">Destination Inbound</th>
-                  <th className="py-2.5 text-right uppercase font-semibold text-[11px] text-primary w-20">Quantity</th>
+              <thead className="bg-slate-50 shadow-sm border-b border-slate-200 sticky top-0 z-10">
+                <tr>
+                  <th className="p-3 text-primary font-bold uppercase tracking-wider font-mono">Transfer_ID</th>
+                  <th className="p-3 text-primary font-bold uppercase tracking-wider">Date</th>
+                  <th className="p-3 text-primary font-bold uppercase tracking-wider font-mono">Source_Loc</th>
+                  <th className="p-3 text-primary font-bold uppercase tracking-wider font-mono">Dest_Store</th>
+                  <th className="p-3 text-primary font-bold uppercase tracking-wider font-mono">SKU_Key</th>
+                  <th className="p-3 text-primary font-bold uppercase tracking-wider text-right">Qty_Pcs</th>
+                  <th className="p-3 text-primary font-bold uppercase tracking-wider text-center w-16">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[rgba(5,28,44,0.06)]">
-                {state.transfers.slice().reverse().map((log) => (
-                  <tr key={log.id} className="hover:bg-[rgba(5,28,44,0.01)] transition-colors">
-                    <td className="py-3 font-mono font-bold text-primary">{log.id}</td>
-                    <td className="py-3 text-[#888888] font-mono">{log.date}</td>
-                    <td className="py-3">
-                      <div className="font-semibold text-primary font-mono">{log.skuKey}</div>
-                      <div className="text-[11px] text-[#888888]">Size {log.size} | {log.color}</div>
+              <tbody className="divide-y divide-slate-100 bg-white">
+                {state.transfers.slice().reverse().map(row => (
+                  <tr key={row.transferId} className="hover:bg-slate-50/50 transition-colors">
+                    <td className="p-3 font-mono font-bold text-primary">{row.transferId}</td>
+                    <td className="p-3 text-slate-500 font-mono">{row.date}</td>
+                    <td className="p-3 font-mono font-semibold text-slate-500 bg-slate-50/40 text-center">{row.sourceLoc}</td>
+                    <td className="p-3 font-semibold text-slate-700">{row.destStore}</td>
+                    <td className="p-3 font-mono font-bold text-primary bg-slate-50/20">{row.skuKey}</td>
+                    <td className="p-3 text-right font-mono font-bold text-accent">{row.qtyPcs}</td>
+                    <td className="p-2 text-center">
+                      <button
+                        onClick={() => {
+                          if (window.confirm(`Delete transfer log ${row.transferId}?`)) {
+                            onDeleteTransfer(row.transferId);
+                          }
+                        }}
+                        className="text-red-500 hover:text-red-700 p-1.5 rounded hover:bg-red-50 transition-colors cursor-pointer"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
                     </td>
-                    <td className="py-3 text-primary/80 font-medium">{log.source}</td>
-                    <td className="py-3 text-primary/80 font-medium">{log.destination}</td>
-                    <td className="py-3 text-right font-mono font-bold text-accent">{log.quantity} pcs</td>
                   </tr>
                 ))}
                 {state.transfers.length === 0 && (
                   <tr>
-                    <td colSpan={6} className="text-center py-8 text-[#888888] italic">No transfers registered yet.</td>
+                    <td colSpan={7} className="text-center py-8 text-slate-400 italic">No transfers registered in the ledger yet.</td>
                   </tr>
                 )}
               </tbody>

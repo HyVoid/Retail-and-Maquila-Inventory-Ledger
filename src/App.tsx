@@ -1,19 +1,22 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import {
   LedgerState,
-  ModelConfig,
-  BulkArrival,
-  MaquilaBatch,
-  TransferLog,
-  SalesLog,
+  ProductMaster,
+  BulkReceiving,
+  BreakdownProduction,
+  WasteMerma,
+  WarehouseTransfer,
+  StoreSales,
   INITIAL_STORES,
-  INITIAL_MODELS,
-  INITIAL_ARRIVALS,
-  INITIAL_MAQUILA_BATCHES,
+  INITIAL_WASTE_TYPES,
+  INITIAL_PRODUCTS,
+  INITIAL_RECEIVING,
+  INITIAL_BREAKDOWN,
+  INITIAL_MERMA,
   INITIAL_TRANSFERS,
   INITIAL_SALES
 } from './types';
-import { calculateSkuInventory, calculateStorePerformance } from './utils/inventory';
+import { calculateCombinedInventory } from './utils/inventory';
 
 // Import Tab Components
 import DashboardTab from './components/DashboardTab';
@@ -26,7 +29,6 @@ import StockCalcTab from './components/StockCalcTab';
 
 // Import Icons
 import {
-  Layers,
   Activity,
   Sliders,
   Package,
@@ -35,20 +37,26 @@ import {
   Download,
   Upload,
   RefreshCw,
-  Clock,
   Settings,
-  HelpCircle
+  HelpCircle,
+  FileSpreadsheet,
+  Layers,
+  ChevronRight
 } from 'lucide-react';
 
-const LOCAL_STORAGE_KEY = 'multi_store_retail_maquila_state';
+const LOCAL_STORAGE_KEY = 'multi_store_retail_maquila_state_v2';
 
 export default function App() {
   // Master Ledger State
   const [state, setState] = useState<LedgerState>({
-    stores: INITIAL_STORES,
-    models: INITIAL_MODELS,
-    arrivals: INITIAL_ARRIVALS,
-    maquilaBatches: INITIAL_MAQUILA_BATCHES,
+    params: {
+      stores: INITIAL_STORES,
+      wasteTypes: INITIAL_WASTE_TYPES
+    },
+    products: INITIAL_PRODUCTS,
+    receiving: INITIAL_RECEIVING,
+    breakdown: INITIAL_BREAKDOWN,
+    merma: INITIAL_MERMA,
     transfers: INITIAL_TRANSFERS,
     sales: INITIAL_SALES,
     lastSaved: ''
@@ -63,7 +71,7 @@ export default function App() {
     if (cached) {
       try {
         const parsed = JSON.parse(cached);
-        if (parsed.stores && parsed.models && parsed.arrivals) {
+        if (parsed.params && parsed.products && parsed.receiving) {
           setState(parsed);
           return;
         }
@@ -75,10 +83,14 @@ export default function App() {
     const now = new Date();
     const formatted = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
     const initialState: LedgerState = {
-      stores: INITIAL_STORES,
-      models: INITIAL_MODELS,
-      arrivals: INITIAL_ARRIVALS,
-      maquilaBatches: INITIAL_MAQUILA_BATCHES,
+      params: {
+        stores: INITIAL_STORES,
+        wasteTypes: INITIAL_WASTE_TYPES
+      },
+      products: INITIAL_PRODUCTS,
+      receiving: INITIAL_RECEIVING,
+      breakdown: INITIAL_BREAKDOWN,
+      merma: INITIAL_MERMA,
       transfers: INITIAL_TRANSFERS,
       sales: INITIAL_SALES,
       lastSaved: formatted
@@ -98,46 +110,131 @@ export default function App() {
     });
   };
 
-  // Master State Callbacks
-  const handleModelsChange = (newModels: ModelConfig[]) => {
-    updateStateAndSave(prev => ({ ...prev, models: newModels }));
-  };
-
+  // 1. Params callbacks
   const handleAddStore = (storeName: string) => {
-    updateStateAndSave(prev => ({ ...prev, stores: [...prev.stores, storeName] }));
+    updateStateAndSave(prev => ({
+      ...prev,
+      params: { ...prev.params, stores: [...prev.params.stores, storeName] }
+    }));
   };
 
-  const handleAddArrival = (arrival: BulkArrival) => {
-    updateStateAndSave(prev => ({ ...prev, arrivals: [...prev.arrivals, arrival] }));
+  const handleAddWasteType = (wasteType: string) => {
+    updateStateAndSave(prev => ({
+      ...prev,
+      params: { ...prev.params, wasteTypes: [...prev.params.wasteTypes, wasteType] }
+    }));
   };
 
-  const handleProcessMaquila = (batch: MaquilaBatch) => {
+  // 2. Product Master callbacks
+  const handleAddProduct = (prod: ProductMaster) => {
+    updateStateAndSave(prev => ({
+      ...prev,
+      products: [...prev.products, prod]
+    }));
+  };
+
+  const handleDeleteProduct = (skuKey: string) => {
+    updateStateAndSave(prev => ({
+      ...prev,
+      products: prev.products.filter(p => p.skuKey !== skuKey)
+    }));
+  };
+
+  const handleUpdateProductCost = (skuKey: string, newCost: number) => {
     updateStateAndSave(prev => {
-      // 1. Add processed batch
-      const updatedBatches = [...prev.maquilaBatches, batch];
-      
-      // 2. Mark corresponding arrival as processed
-      const updatedArrivals = prev.arrivals.map(arr => {
-        if (arr.id === batch.arrivalId) {
-          return { ...arr, status: 'Processed' as const };
-        }
-        return arr;
-      });
+      const updatedProducts = prev.products.map(p =>
+        p.skuKey === skuKey ? { ...p, costPrice: newCost } : p
+      );
+      // recalculate all breakdown and merma row values reflecting the new XLOOKUP cost
+      const updatedBreakdown = prev.breakdown.map(b =>
+        b.skuKey === skuKey ? { ...b, costPrice: newCost } : b
+      );
+      const updatedMerma = prev.merma.map(m =>
+        m.skuKey === skuKey ? { ...m, lossValue: m.qtyPcs * newCost } : m
+      );
 
       return {
         ...prev,
-        maquilaBatches: updatedBatches,
-        arrivals: updatedArrivals
+        products: updatedProducts,
+        breakdown: updatedBreakdown,
+        merma: updatedMerma
       };
     });
   };
 
-  const handleAddTransfer = (transfer: TransferLog) => {
-    updateStateAndSave(prev => ({ ...prev, transfers: [...prev.transfers, transfer] }));
+  // 3. Receiving callbacks
+  const handleAddReceiving = (rec: BulkReceiving) => {
+    updateStateAndSave(prev => ({
+      ...prev,
+      receiving: [...prev.receiving, rec]
+    }));
   };
 
-  const handleAddSale = (sale: SalesLog) => {
-    updateStateAndSave(prev => ({ ...prev, sales: [...prev.sales, sale] }));
+  const handleDeleteReceiving = (id: string) => {
+    updateStateAndSave(prev => ({
+      ...prev,
+      receiving: prev.receiving.filter(r => r.receivingId !== id)
+    }));
+  };
+
+  // 4. Breakdown & Production callbacks
+  const handleAddBreakdownRows = (rows: BreakdownProduction[]) => {
+    updateStateAndSave(prev => ({
+      ...prev,
+      breakdown: [...prev.breakdown, ...rows]
+    }));
+  };
+
+  const handleDeleteBreakdownRow = (index: number) => {
+    updateStateAndSave(prev => ({
+      ...prev,
+      breakdown: prev.breakdown.filter((_, i) => i !== index)
+    }));
+  };
+
+  // 5. Merma callbacks
+  const handleAddMerma = (m: WasteMerma) => {
+    updateStateAndSave(prev => ({
+      ...prev,
+      merma: [...prev.merma, m]
+    }));
+  };
+
+  const handleDeleteMerma = (index: number) => {
+    updateStateAndSave(prev => ({
+      ...prev,
+      merma: prev.merma.filter((_, i) => i !== index)
+    }));
+  };
+
+  // 6. Transfer callbacks
+  const handleAddTransfer = (tr: WarehouseTransfer) => {
+    updateStateAndSave(prev => ({
+      ...prev,
+      transfers: [...prev.transfers, tr]
+    }));
+  };
+
+  const handleDeleteTransfer = (id: string) => {
+    updateStateAndSave(prev => ({
+      ...prev,
+      transfers: prev.transfers.filter(t => t.transferId !== id)
+    }));
+  };
+
+  // 7. Sales callbacks
+  const handleAddSale = (s: StoreSales) => {
+    updateStateAndSave(prev => ({
+      ...prev,
+      sales: [...prev.sales, s]
+    }));
+  };
+
+  const handleDeleteSale = (id: string) => {
+    updateStateAndSave(prev => ({
+      ...prev,
+      sales: prev.sales.filter(s => s.salesId !== id)
+    }));
   };
 
   // Export state backup file
@@ -150,7 +247,7 @@ export default function App() {
     const now = new Date();
     const dateStr = now.toISOString().slice(0, 10);
     link.href = url;
-    link.download = `inventory-ledger-backup-${dateStr}.json`;
+    link.download = `supply-chain-ledger-backup-${dateStr}.json`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -169,12 +266,12 @@ export default function App() {
         const parsed = JSON.parse(content);
         
         // Basic schema verification
-        if (parsed.stores && parsed.models && parsed.arrivals && parsed.maquilaBatches) {
+        if (parsed.params && parsed.products && parsed.receiving) {
           const now = new Date();
           parsed.lastSaved = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
           setState(parsed);
           localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(parsed));
-          alert('Backup imported successfully! All records and ledgers have been updated.');
+          alert('Ledger Backup spreadsheet imported successfully!');
         } else {
           alert('Error: Selected file is not a valid ledger backup schema.');
         }
@@ -183,20 +280,23 @@ export default function App() {
       }
     };
     reader.readAsText(file);
-    // clear input
     e.target.value = '';
   };
 
   // Wipe data and reset to original initial mock template
   const handleResetData = () => {
-    if (window.confirm('Are you absolutely sure you want to reset all inventory records, sales, and transfers back to default demo templates? This cannot be undone.')) {
+    if (window.confirm('Wipe ledger databases and reset to default templates? All your logs will be restored.')) {
       const now = new Date();
       const formatted = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
       const resetState: LedgerState = {
-        stores: INITIAL_STORES,
-        models: INITIAL_MODELS,
-        arrivals: INITIAL_ARRIVALS,
-        maquilaBatches: INITIAL_MAQUILA_BATCHES,
+        params: {
+          stores: INITIAL_STORES,
+          wasteTypes: INITIAL_WASTE_TYPES
+        },
+        products: INITIAL_PRODUCTS,
+        receiving: INITIAL_RECEIVING,
+        breakdown: INITIAL_BREAKDOWN,
+        merma: INITIAL_MERMA,
         transfers: INITIAL_TRANSFERS,
         sales: INITIAL_SALES,
         lastSaved: formatted
@@ -206,68 +306,69 @@ export default function App() {
     }
   };
 
-  // Calculations derived from transaction lists
-  const skuInventoryRows = useMemo(() => {
-    return calculateSkuInventory(state);
-  }, [state]);
-
-  const storePerformanceRows = useMemo(() => {
-    return calculateStorePerformance(state);
+  // Calculations derived from transaction list
+  const skuInventory = useMemo(() => {
+    return calculateCombinedInventory(state);
   }, [state]);
 
   // Tab Switching Anim Helper
   const renderActiveTab = () => {
     switch (activeTab) {
       case 'dashboard':
-        return <DashboardTab state={state} skuRows={skuInventoryRows} storePerformance={storePerformanceRows} />;
-      case 'config':
-        return <ConfigTab state={state} onChangeModels={handleModelsChange} onAddStore={handleAddStore} />;
-      case 'arrivals':
-        return <BulkInTab state={state} onAddArrival={handleAddArrival} onProcessMaquila={handleProcessMaquila} />;
-      case 'maquila':
-        return <BreakMaqTab state={state} />;
-      case 'transfers':
-        return <TransferTab state={state} skuRows={skuInventoryRows} onAddTransfer={handleAddTransfer} />;
-      case 'sales':
-        return <SalesLogTab state={state} skuRows={skuInventoryRows} onAddSale={handleAddSale} />;
+        return <DashboardTab state={state} skuInventory={skuInventory} />;
       case 'ledger':
-        return <StockCalcTab state={state} skuRows={skuInventoryRows} />;
+        return <StockCalcTab state={state} onAddMerma={handleAddMerma} onDeleteMerma={handleDeleteMerma} />;
+      case 'arrivals':
+        return <BulkInTab state={state} onAddReceiving={handleAddReceiving} onDeleteReceiving={handleDeleteReceiving} />;
+      case 'maquila':
+        return <BreakMaqTab state={state} onAddBreakdownRows={handleAddBreakdownRows} onDeleteBreakdownRow={handleDeleteBreakdownRow} />;
+      case 'transfers':
+        return <TransferTab state={state} skuInventory={skuInventory} onAddTransfer={handleAddTransfer} onDeleteTransfer={handleDeleteTransfer} />;
+      case 'sales':
+        return <SalesLogTab state={state} skuInventory={skuInventory} onAddSale={handleAddSale} onDeleteSale={handleDeleteSale} />;
+      case 'config':
+        return (
+          <ConfigTab
+            state={state}
+            onAddStore={handleAddStore}
+            onAddWasteType={handleAddWasteType}
+            onAddProduct={handleAddProduct}
+            onDeleteProduct={handleDeleteProduct}
+            onUpdateProductCost={handleUpdateProductCost}
+          />
+        );
       default:
-        return <DashboardTab state={state} skuRows={skuInventoryRows} storePerformance={storePerformanceRows} />;
+        return <DashboardTab state={state} skuInventory={skuInventory} />;
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-bg-custom text-body-text selection:bg-accent/20">
+    <div className="min-h-screen flex flex-col bg-[#F5F5F2] text-slate-800 selection:bg-accent/20">
       
-      {/* Horizonal Sticky Top Nav Bar (56px) */}
-      <header className="sticky top-0 z-40 h-[56px] bg-white border-b border-[var(--nav-border)] shadow-nav px-8 flex items-center justify-between">
+      {/* Horizontal Sticky Top Nav Bar */}
+      <header className="sticky top-0 z-40 h-[56px] bg-white border-b border-slate-200 shadow-sm px-6 flex items-center justify-between">
         
         {/* Left Side: Brand Identity */}
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shadow-sm">
-            <Layers className="w-4.5 h-4.5 text-white" />
+        <div className="flex items-center gap-2">
+          <div className="brand font-display text-[18px] font-black text-primary tracking-tight flex items-center gap-1.5 uppercase">
+            <span className="p-1 bg-primary text-white rounded font-mono text-xs">SC</span>
+            <span>Supply Chain Control</span>
           </div>
-          <div>
-            <h1 className="font-display font-semibold text-sm tracking-tight text-primary uppercase leading-tight">
-              RETAIL & MAQUILA
-            </h1>
-            <span className="text-[10px] text-[#888888] uppercase tracking-widest block font-bold">
-              INVENTORY LEDGER
-            </span>
-          </div>
+          <span className="text-xs text-[#888888] font-mono border-l border-slate-200 pl-3 hidden lg:inline">
+            Event-Driven Inventory Engine
+          </span>
         </div>
 
         {/* Center: Tabs Switcher */}
-        <nav className="hidden md:flex items-center h-full">
+        <nav className="hidden md:flex items-center gap-6 h-full">
           {[
             { id: 'dashboard', label: 'Executive Dashboard', icon: Activity },
-            { id: 'ledger', label: 'Stock Ledger', icon: Package },
-            { id: 'arrivals', label: 'Arrivals', icon: Download },
-            { id: 'maquila', label: 'Maquila', icon: RefreshCw },
-            { id: 'transfers', label: 'Transfers', icon: ArrowLeftRight },
-            { id: 'sales', label: 'Retail Sales', icon: TrendingUp },
-            { id: 'config', label: 'Config Parameters', icon: Settings }
+            { id: 'ledger', label: 'Excel Calculation Engines', icon: FileSpreadsheet },
+            { id: 'arrivals', label: 'Bulk Receiving', icon: Download },
+            { id: 'maquila', label: 'Breakdown Production', icon: RefreshCw },
+            { id: 'transfers', label: 'Warehouse Transfers', icon: ArrowLeftRight },
+            { id: 'sales', label: 'Store Sales Log', icon: TrendingUp },
+            { id: 'config', label: 'Product Master / Params', icon: Settings }
           ].map(tab => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -275,13 +376,13 @@ export default function App() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`h-full px-4 flex items-center gap-1.5 border-b-2 text-xs font-semibold tracking-wide transition-all cursor-pointer relative ${
+                className={`h-full flex items-center gap-2 border-b-2 text-xs font-bold tracking-wide transition-all cursor-pointer relative ${
                   isActive
-                    ? 'border-accent text-accent bg-blue-50/20'
-                    : 'border-transparent text-primary/75 hover:text-primary hover:bg-slate-50/50'
+                    ? 'border-accent text-accent'
+                    : 'border-transparent text-slate-500 hover:text-primary'
                 }`}
               >
-                <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-accent' : 'text-[#888888]'}`} />
+                <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-accent' : 'text-slate-400'}`} />
                 <span>{tab.label}</span>
                 {isActive && (
                   <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent" />
@@ -295,18 +396,18 @@ export default function App() {
         <div className="flex items-center gap-4 text-xs">
           {/* Last Saved Pill */}
           {state.lastSaved && (
-            <div className="hidden sm:flex items-center gap-1 bg-slate-100 text-primary/80 border border-slate-200/50 px-2.5 py-1 rounded-full text-[11px] font-medium select-none">
-              <Clock className="w-3.5 h-3.5 text-[#888888]" />
-              <span>Last saved: {state.lastSaved}</span>
+            <div className="hidden sm:flex items-center gap-1.5 bg-slate-50 text-slate-500 border border-slate-200 px-2.5 py-1 rounded-full text-[10px] font-bold">
+              <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-pulse" />
+              <span>Synced: {state.lastSaved}</span>
             </div>
           )}
 
           {/* Action Operations */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             {/* Export Backup */}
             <button
               onClick={handleExportBackup}
-              className="p-1.5 hover:bg-slate-100 rounded text-primary hover:text-accent transition-colors cursor-pointer"
+              className="p-1.5 hover:bg-slate-100 rounded text-slate-500 hover:text-primary transition-colors cursor-pointer"
               title="Export Local Backup JSON"
             >
               <Download className="w-4 h-4" />
@@ -314,7 +415,7 @@ export default function App() {
 
             {/* Import Backup */}
             <label
-              className="p-1.5 hover:bg-slate-100 rounded text-primary hover:text-accent transition-colors cursor-pointer inline-block"
+              className="p-1.5 hover:bg-slate-100 rounded text-slate-500 hover:text-primary transition-colors cursor-pointer inline-block"
               title="Import Backup JSON file"
             >
               <Upload className="w-4 h-4" />
@@ -329,7 +430,7 @@ export default function App() {
             {/* Reset Data */}
             <button
               onClick={handleResetData}
-              className="p-1.5 hover:bg-slate-100 rounded text-negative hover:bg-red-50 transition-colors cursor-pointer"
+              className="p-1.5 hover:bg-slate-100 rounded text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
               title="Wipe and Reset to Default Demo Data"
             >
               <RefreshCw className="w-4 h-4" />
@@ -340,23 +441,23 @@ export default function App() {
       </header>
 
       {/* Mobile Nav Helper bar */}
-      <div className="md:hidden sticky top-[56px] z-30 bg-white border-b border-[var(--nav-border)] px-4 py-2 overflow-x-auto flex gap-2">
+      <div className="md:hidden sticky top-[56px] z-30 bg-white border-b border-slate-200 px-4 py-2 overflow-x-auto flex gap-2 shadow-sm">
         {[
           { id: 'dashboard', label: 'Dashboard' },
-          { id: 'ledger', label: 'Ledger' },
-          { id: 'arrivals', label: 'Arrivals' },
-          { id: 'maquila', label: 'Maquila' },
+          { id: 'ledger', label: 'Engines' },
+          { id: 'arrivals', label: 'Receiving' },
+          { id: 'maquila', label: 'Breakdown' },
           { id: 'transfers', label: 'Transfers' },
           { id: 'sales', label: 'Sales' },
-          { id: 'config', label: 'Config' }
+          { id: 'config', label: 'Master' }
         ].map(tab => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap cursor-pointer transition-colors ${
+            className={`px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap cursor-pointer transition-colors ${
               activeTab === tab.id
                 ? 'bg-accent text-white'
-                : 'bg-slate-100 text-primary hover:bg-slate-200'
+                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
             }`}
           >
             {tab.label}
@@ -364,49 +465,55 @@ export default function App() {
         ))}
       </div>
 
-      {/* Main Container Content (max-width 1400px, centered, 40px left/right padding) */}
-      <main className="flex-1 w-full max-w-[1400px] mx-auto px-10 py-8">
+      {/* Main Container Content */}
+      <main className="flex-1 w-full max-w-[1400px] mx-auto px-6 py-8">
         
         {/* Dynamic header title based on Tab */}
-        <div className="mb-6 flex flex-wrap justify-between items-end gap-3">
+        <div className="mb-6 flex flex-wrap justify-between items-end gap-3 border-b border-slate-200 pb-4">
           <div>
-            <h2 className="font-display text-2xl font-bold tracking-tight text-primary uppercase">
-              {activeTab === 'dashboard' && "Executive Decision Center"}
-              {activeTab === 'ledger' && "Real-Time Stock Audit Ledger"}
-              {activeTab === 'arrivals' && "Bulk Cargo Receiving Yard"}
-              {activeTab === 'maquila' && "Maquila Processing Records"}
-              {activeTab === 'transfers' && "Inter-Channel Distribution Dispatch"}
-              {activeTab === 'sales' && "POS Retail Revenue Logging"}
-              {activeTab === 'config' && "Baseline Settings Configurator"}
+            <div className="flex items-center gap-1.5 text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1 select-none">
+              <span>Retail Supply Chain Control Tool</span>
+              <ChevronRight className="w-3.5 h-3.5 text-slate-300" />
+              <span className="text-slate-500">
+                {activeTab === 'dashboard' && "Executive BI Screen"}
+                {activeTab === 'ledger' && "Computation Engines"}
+                {activeTab === 'arrivals' && "Receiving Logs"}
+                {activeTab === 'maquila' && "Breakdown & Production logs"}
+                {activeTab === 'transfers' && "Warehouse Dispatch"}
+                {activeTab === 'sales' && "POS Terminal Logs"}
+                {activeTab === 'config' && "Model Master Config"}
+              </span>
+            </div>
+            <h2 className="font-display text-[26px] font-black tracking-tight text-primary leading-none">
+              {activeTab === 'dashboard' && "Executive Decision Center Dashboard"}
+              {activeTab === 'ledger' && "Dynamic Excel Inventory Engines"}
+              {activeTab === 'arrivals' && "Bulk Cargo Cargo Receiving (tbl_Receiving)"}
+              {activeTab === 'maquila' && "Breakdown & Packaging Production (tbl_Breakdown)"}
+              {activeTab === 'transfers' && "Inter-Store Logistics Dispatch (tbl_Transfers)"}
+              {activeTab === 'sales' && "Store Retail Sales Ledger (tbl_Sales)"}
+              {activeTab === 'config' && "Baseline Parameters & SKU Master (tbl_Products)"}
             </h2>
-            <p className="text-xs text-[#888888] mt-1 font-sans">
-              {activeTab === 'dashboard' && "High-fidelity KPI tracking, executive slicers, store profit comparisons, and color-size matrices."}
-              {activeTab === 'ledger' && "Instant cross-channel SKU query, safety stock triggers, and visual stock magnitude density mapping."}
-              {activeTab === 'arrivals' && "Log incoming bulk cargo containers. Trigger color-size breakdowns for custom outer packaging."}
-              {activeTab === 'maquila' && "Review previous out-of-box packing splits. Audit material loss (Merma) yields against contract benchmarks."}
-              {activeTab === 'transfers' && "Authorize logistics transport routes. Form validates and locks source inventory to prevent negative values."}
-              {activeTab === 'sales' && "Record retail client transaction flow. Live subtotal computation with proportional discounts."}
-              {activeTab === 'config' && "Edit store lists, clothing categories, and configure safety threshold limits to adjust system warnings."}
-            </p>
           </div>
 
-          <div className="text-right text-[11px] text-[#888888] font-mono select-none">
-            System Environment: <span className="text-primary font-bold">Cloud Run Sandbox</span> | Version: <span className="text-primary font-bold">v3.4.1-SaaS</span>
+          <div className="text-right text-[10px] text-slate-400 font-mono select-none hidden lg:block bg-slate-100 border border-slate-200 px-3 py-1 rounded-lg">
+            App State: <span className="text-primary font-bold">Client Event-Ledger</span> | Standard: <span className="text-primary font-bold">Excel-Compatible Formulas</span>
           </div>
         </div>
 
-        {/* Tab View Container with fadeUp transition */}
-        <div className="animate-fade-up">
+        {/* Tab View Container */}
+        <div className="min-h-[400px]">
           {renderActiveTab()}
         </div>
 
       </main>
 
-      {/* Humble Footer */}
-      <footer className="py-6 border-t border-[rgba(5,28,44,0.06)] bg-white text-center text-[11px] text-[#888888] select-none">
-        <div className="max-w-[1400px] mx-auto px-10 flex flex-wrap justify-between items-center gap-4">
-          <span>&copy; 2026 Retail & Maquila Inventory Management Systems. All rights reserved.</span>
-          <span className="font-mono">Secure Client Sandbox | No External Database Dependencies</span>
+      {/* Footer */}
+      <footer className="py-6 border-t border-slate-200 bg-white text-center text-[11px] text-slate-400 select-none">
+        <div className="max-w-[1400px] mx-auto px-6 flex flex-wrap justify-between items-center gap-4">
+          <span>&copy; 2026 Retail Inventory Control & Maquila Logistics Panel. Excel-Driven Architecture.</span>
+          <span className="font-mono bg-slate-50 px-2.5 py-1 border border-slate-200 rounded text-slate-500">
+            System Sandbox v4.1 (React + Tailwind)
+          </span>
         </div>
       </footer>
 
