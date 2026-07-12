@@ -351,8 +351,8 @@ export default function App() {
         {/* Left Side: Brand Identity */}
         <div className="flex items-center gap-2">
           <div className="brand font-display text-[18px] font-black text-primary tracking-tight flex items-center gap-1.5 uppercase">
-            <span className="p-1 bg-primary text-white rounded font-mono text-xs">SC</span>
-            <span>Supply Chain Control</span>
+            <span className="p-1 bg-primary text-white rounded font-mono text-xs">RM</span>
+            <span>Retail and Maquila Inventory Ledger</span>
           </div>
           <span className="text-xs text-[#888888] font-mono border-l border-slate-200 pl-3 hidden lg:inline">
             Event-Driven Inventory Engine
@@ -472,7 +472,7 @@ export default function App() {
         <div className="mb-6 flex flex-wrap justify-between items-end gap-3 border-b border-slate-200 pb-4">
           <div>
             <div className="flex items-center gap-1.5 text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1 select-none">
-              <span>Retail Supply Chain Control Tool</span>
+              <span>Retail and Maquila Inventory Ledger</span>
               <ChevronRight className="w-3.5 h-3.5 text-slate-300" />
               <span className="text-slate-500">
                 {activeTab === 'dashboard' && "Executive BI Screen"}
