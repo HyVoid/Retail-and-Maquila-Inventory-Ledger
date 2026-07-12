@@ -1,6 +1,4 @@
-# 🌍 English | [简体中文](README.zh-CN.md)
-
-# Inventory Operations Control Tool
+# Retail and Maquila Inventory Ledger
 ### Event-Driven Inventory Tracking and Decision Support for Retail & Apparel Supply Chains
 
 ![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)
