@@ -10,24 +10,15 @@
 > ### **No signup. No installation. Free.**
 >
 > 🌐 **Open in Browser**  
-> *(HTML live version — coming soon)*
+> [*HTML live*](https://hyvoid.github.io/Retail-and-Maquila-Inventory-Ledger/)
 >
 > 📥 **Download Excel**  
-> *(GitHub Release / Gumroad — coming soon)*
+> [*download link*](https://alexhasgreatestuff.gumroad.com/l/zllojx)
 
 ---
 
 # Screenshots
 
-### Browser Version
-
-<!-- screenshot: browser version -->
-
-*A browser-based operational dashboard showing warehouse inventory, store stock, inventory health, transfers, waste analysis, and sales performance.*
-
----
-
-### Excel Version
 
 <!-- screenshot: excel version -->
 
