@@ -17,15 +17,6 @@
 
 ---
 
-# Screenshots
-
-
-<!-- screenshot: excel version -->
-
-*The Excel workbook where operational events are recorded once and automatically flow through calculation engines into management dashboards.*
-
----
-
 # What It Helps You Track
 
 Instead of manually reconciling inventory balances across multiple spreadsheets, the workbook continuously reconstructs inventory positions from operational events.
