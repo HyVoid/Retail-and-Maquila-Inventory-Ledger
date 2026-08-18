@@ -13,7 +13,7 @@
 > [*HTML live*](https://hyvoid.github.io/Retail-and-Maquila-Inventory-Ledger/)
 >
 > 📥 **Download Excel**  
-> [*download link*](https://alexhasgreatestuff.gumroad.com/l/zllojx)
+> [*download link*](https://alexhasgreatestuff.gumroad.com/l/zllojx?utm_source=github&utm_medium=GitHub%20README&utm_campaign=readme%20new%20launch&utm_content=multistore-retail-maquila-inventory)
 
 ---
 
