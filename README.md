@@ -7,7 +7,9 @@
 
 **Track every inventory movement from receiving to sale through a single event-driven workflow—free to use, with both browser and Excel editions, no installation or signup required.**
 
-> ### **No signup. No installation. Free.**
+**No signup. No installation. Free in your browser.**
+
+Try the browser version for free. If you need the Excel version, you can buy it with a 7-day money-back guarantee.
 >
 > 🌐 **Open in Browser**  
 > [*HTML live*](https://hyvoid.github.io/Retail-and-Maquila-Inventory-Ledger/)
