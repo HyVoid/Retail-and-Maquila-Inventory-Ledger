@@ -1,559 +1,206 @@
-# Retail and Maquila Inventory Ledger
-### Event-Driven Inventory Tracking and Decision Support for Retail & Apparel Supply Chains
+# Retail and Maquila Inventory Ledger: Multi-Store Excel Template & Web Tracker
+### Event-Driven Inventory Tracking and Decision Support System for Retail, eCommerce, & Apparel Supply Chains
 
 ![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)
 ![Platform](https://img.shields.io/badge/Platform-Browser%20%2B%20Excel-success)
 ![Tool](https://img.shields.io/badge/Tool-Inventory%20Decision%20Support-orange)
 
-**Track every inventory movement from receiving to sale through a single event-driven workflow—free to use, with both browser and Excel editions, no installation or signup required.**
+**Automate your SKU tracking and warehouse stock reconciliation with this event-driven inventory management template.** Track every inventory movement—from bulk receiving and manufacturing breakdown to omnichannel retail sales and warehouse transfers—through a single workflow. Available as a free browser-based supply chain dashboard and a downloadable premium Excel inventory tracker. No complex ERP installation or cloud software signup required.
 
-**No signup. No installation. Free in your browser.**
+**No signup. No installation. Ready to use in your browser.**
 
-Try the browser version for free. If you need the Excel version, you can buy it with a 7-day money-back guarantee.
+Test the event-driven logic via the free web app. For ongoing, offline business operations, upgrade to the fully customizable Excel version (backed by a 7-day money-back guarantee).
+
+> 🌐 **Test the Live Demo**  
+> [*Launch Free Web-Based Retail Inventory Tracker Dashboard*](https://hyvoid.github.io/Retail-and-Maquila-Inventory-Ledger/)
 >
-> 🌐 **Open in Browser**  
-> [*HTML live*](https://hyvoid.github.io/Retail-and-Maquila-Inventory-Ledger/)
->
-> 📥 **Download Excel**  
-> [*download link*](https://alexhasgreatestuff.gumroad.com/l/zllojx?utm_source=github&utm_medium=GitHub%20README&utm_campaign=readme%20new%20launch&utm_content=multistore-retail-maquila-inventory)
+> 📥 **Download the Spreadsheet**  
+> [*Download Premium Excel Inventory Ledger Template for Multi-Store Operations*](https://alexhasgreatestuff.gumroad.com/l/zllojx?utm_source=github&utm_medium=GitHub%20README&utm_campaign=readme%20new%20launch&utm_content=multistore-retail-maquila-inventory)
 
 ---
 
-# What It Helps You Track
+## Inventory Management Pain Points & Automated Ledger Solutions
 
-Instead of manually reconciling inventory balances across multiple spreadsheets, the workbook continuously reconstructs inventory positions from operational events.
+Instead of manually reconciling inventory balances across multiple disconnected spreadsheets—which leads to phantom stock and fulfillment errors—this workbook continuously reconstructs real-time **inventory positions from operational events**. 
 
-It provides visibility into:
+This system directly solves common supply chain blind spots by providing instant visibility into:
 
-- Warehouse inventory available after production, transfers, and warehouse waste.
-- Current inventory for every SKU across every retail store from a single consolidated view.
-- Inventory value tied to actual unit costs instead of estimated balances.
-- Product losses by operational cause, including production defects, transit damage, and store shrinkage.
-- Sales performance alongside inventory depletion to identify fast-moving and slow-moving products.
-- Inventory health indicators that highlight stock shortages, overstock situations, and operational exceptions before they become financial problems.
-
----
-
-# Quick Start Workflow
-
-Getting operational insight requires only a few recurring steps. No formulas need to be edited after the workbook is configured.
-
-### 1. Configure the business once
-
-Open the **Parameters** worksheet and define the operational environment.
-
-Typical configuration includes:
-
-- Warehouse and store locations
-- Waste categories
-- Product master records
-- Cost information
-- Operating thresholds
-
-This setup normally changes only when new products or stores are introduced.
+- **Warehouse Stock Availability:** Track usable inventory remaining after production breakdown, internal transfers, and recorded warehouse waste (merma).
+- **Multi-Location Retail Tracking:** Monitor current inventory levels for every SKU across every physical retail store or POS location from a single consolidated dashboard.
+- **Accurate Cost of Goods Sold (COGS) & Valuation:** Tie your inventory value to actual unit costs defined in your master data, replacing estimated financial balances.
+- **Actionable Shrinkage & Loss Tracking:** Categorize product losses by operational root cause, mapping exact metrics for production defects, transit damage, and retail store shrinkage.
+- **SKU Performance & Velocity:** Compare POS sales performance alongside inventory depletion rates to instantly identify fast-moving winners and dead stock.
+- **Predictive Inventory Health Indicators:** Highlight safety stock shortages, overstock situations, and supply chain exceptions before they impact your cash flow.
 
 ---
 
-### 2. Import operational data
+## Who This Is For: Target Roles & Supply Chain Use Cases
 
-Copy existing operational records into the designated input tables.
+This workbook is purpose-built for organizations that manage inventory across centralized warehouses and decentralized retail locations, relying on flexible Excel architectures or exported CSV operational data rather than rigid, expensive enterprise ERP implementations.
 
-Typical sources include:
+**Target User Profiles & Operational Scenarios:**
 
-- ERP exports
-- POS exports
-- CSV files
-- Warehouse management reports
-- Supplier receiving logs
-- Existing Excel worksheets
+- 🛍️ **Retail Supply Chain Managers requiring an Inventory Operations Template:** To orchestrate strategic stock redistribution among stores instead of blindly issuing purchase orders (POs) when isolated warehouse stock runs low.
+- 🏭 **Apparel & Maquila Production Managers needing a Bulk Breakdown Tool:** To flawlessly track the conversion of bulk receiving (pallets/cartons) into individual, sellable SKUs (Model-Color-Size matrix).
+- 📦 **Warehouse Supervisors searching for a Cycle Count & Shrinkage Spreadsheet:** To continuously document product losses by operational cause rather than waiting for chaotic month-end physical reconciliation.
+- 📊 **eCommerce & Omnichannel Operations Analysts building KPIs:** To rapidly ingest POS (Point of Sale) or Shopify CSV exports into a consolidated management dashboard for daily reporting.
+- 🏪 **Small & Medium Business (SMB) Owners seeking a Lightweight ERP Alternative:** To manage multi-store inventory routing and profitability without the overhead, training costs, and integration delays of full-scale WMS (Warehouse Management Systems).
 
-Data is entered only into the transaction sheets.
-
-No manual recalculation is required.
+*(Note: This workbook is **not** intended to replace high-volume enterprise systems requiring real-time concurrent transaction locking or active barcode scanning APIs.)*
 
 ---
 
-### 3. Review operational results
+## Quick Start Tutorial: Automate Your Inventory Workflow (Step-by-Step)
 
-Switch to the inventory engines or management dashboard.
+Getting actionable supply chain insights requires only a few standardized steps. No complex formulas need to be edited after your initial configuration.
 
-The workbook automatically updates:
+### 1. Configure the Business Rules (Master Data Setup)
+Open the **Parameters** worksheet to map your operational footprint. Define your network of warehouse and store locations, customize waste categories, import your product master records (SKUs), and set standard unit costs. *Action: Configure this once; update only when adding new product lines or retail branches.*
 
-- Warehouse inventory
-- Store inventory
-- Inventory valuation
-- Sales revenue
-- Waste analysis
-- KPI summaries
+### 2. Import Operational Data (POS & WMS CSV Ingestion)
+Copy existing transactional records into the designated event tables. Simply paste data from your ERP exports, Shopify/POS CSV files, supplier receiving logs, or legacy Excel sheets. *Action: Paste data into transaction sheets. Zero manual formula recalculation is required.*
 
-The dashboard immediately reflects the latest operational position.
+### 3. Review Operational KPIs (Dashboard Analytics)
+Navigate directly to the inventory engines or the visual management dashboard. The system automatically recalculates warehouse stock, multi-store SKU distribution, inventory valuation, sales revenue, and waste analysis. *Action: Use these insights to make immediate replenishment or transfer decisions.*
 
----
+### 4. Refresh & Repeat (Continuous Replenishment Cycle)
+Repeat the data import process daily, weekly, or monthly based on your fulfillment cycle. No redesigning files. No rebuilding broken links. Simply append new business events and refresh. 
 
-### 4. Refresh on a regular schedule
-
-Repeat the same import process weekly, daily, or monthly depending on business requirements.
-
-No redesign.
-
-No rebuilding.
-
-No additional configuration.
-
-Simply replace or append operational transactions and refresh the workbook.
-
-**Set a few key parameters. Drop in existing operational data. Review the analysis. Refresh whenever new transactions become available.**
+> 🚀 **Take Action:** Ready to standardize your operations? Once you've validated your business logic in the free browser trial, **[Download the Excel Inventory Template](https://alexhasgreatestuff.gumroad.com/l/zllojx)**. Keep it locally to build a secure, repeatable, and permanent offline supply chain database for your business.
 
 ---
 
-# Why I Built This
+## The Core Concept: Why I Built This Event-Driven Framework
 
-Many retail businesses believe they have an inventory problem when they actually have an information problem.
+Many retail businesses believe they have a systemic *inventory problem* when, in reality, they suffer from an *information architecture problem*.
 
-Inventory is often maintained by directly adjusting balances whenever something changes. Receiving updates one spreadsheet. Production maintains another. Store managers record sales somewhere else. Warehouse transfers are tracked separately, while damaged goods are frequently documented only after month-end reconciliation.
+Traditionally, stock is maintained by directly overwriting balances. Receiving updates one spreadsheet. Production updates another. Store managers record point-of-sale data elsewhere. Eventually, the cycle counts stop agreeing, and the business spends more time auditing stock discrepancies than actually optimizing fulfillment.
 
-Eventually the inventory numbers stop agreeing.
+**I built this workbook around a paradigm shift: The Event-Driven Inventory Ledger.**
 
-At that point, nobody knows whether the discrepancy came from production, transfers, shrinkage, or delayed data entry. The business spends more time explaining inventory than managing it.
+Instead of maintaining static balances, every physical activity becomes an immutable event. Receiving bulk cargo, transferring goods, logging transit damage, and recording retail sales are logged independently. The inventory balance is then **automatically reconstructed from these historical events**.
 
-I built this workbook around a different idea.
+### The Multi-Store Replenishment Trap (An Example)
+Before using this framework, a warehouse manager might see that **SKU MD-01 has only 18 units remaining** in the central facility and trigger an urgent supplier PO.
 
-Instead of maintaining inventory balances directly, every operational activity becomes an event. Receiving inventory, converting bulk stock into sellable SKUs, transferring products, recording waste, and posting sales are stored as independent business events. Inventory is reconstructed automatically from those events every time the workbook refreshes.
-
-A typical example illustrates why this matters.
-
-Before using this framework, a warehouse manager might simply see that **SKU MD-01 has only 18 units remaining** and immediately schedule an urgent replenishment.
-
-After reconstructing the complete event history, the same inventory position may reveal something very different:
-
-- 60 units were transferred to stores yesterday.
+By reconstructing the complete event history across the omnichannel network, this template reveals the truth:
+- 60 units were transferred to regional stores yesterday.
 - 42 units remain unsold in retail locations.
-- 8 units were written off due to production defects.
-- Warehouse inventory appears low, but company-wide inventory is healthy.
+- Warehouse safety stock appears low, but *company-wide inventory is completely healthy*.
 
-The recommendation changes completely.
-
-Instead of manufacturing more inventory, management can redistribute existing stock and investigate the unusually high production waste.
-
-That reasoning is reusable.
-
-Rather than creating another custom spreadsheet for every company, this workbook packages the analytical logic into a repeatable framework that can be applied whenever inventory decisions depend on understanding **how inventory moved**, not simply **where inventory currently appears to be**.
+**The decision changes entirely:** Instead of wasting cash on manufacturing more inventory, management redistributes existing retail stock to meet demand. This logic is universally applicable, which is why this template is structured as a reusable decision-support asset.
 
 ---
 
-# Common Inventory Management Problems This Solves
+## System Comparison: Manual Spreadsheets vs. Event-Driven Ledger
 
-| Problem | Without This Tool | With This Tool |
-|----------|-------------------|----------------|
-| Inventory balances drift over time | Manual adjustments overwrite history, making discrepancies difficult to explain. | Every inventory movement remains traceable as a business event with a complete audit trail. |
-| Warehouse appears out of stock while stores hold excess inventory | Purchasing decisions rely only on warehouse balances. | Warehouse and store inventory are evaluated together before replenishment decisions are made. |
-| Product losses become visible only during physical counts | Shrinkage accumulates unnoticed until month-end reconciliation. | Waste is categorized by operational cause and quantified continuously. |
-| Store inventory requires separate worksheets for every location | Additional stores increase maintenance effort and reporting complexity. | New stores automatically appear in the dynamic inventory matrix without redesigning formulas. |
-| Management cannot identify where inventory disappeared | Receiving, production, transfers, sales, and adjustments exist in isolated files. | Every inventory change is reconstructed into a single operational timeline. |
-| Inventory valuation becomes unreliable | Stock quantities and unit costs are maintained independently. | Inventory quantities and cost data remain linked through standardized SKU master records. |
-
----
-
-# Who This Is For
-
-This workbook is designed for organizations that manage inventory across warehouses and retail locations while relying on Excel or exported operational data instead of a full ERP implementation.
-
-Typical users include:
-
-- Retail and apparel supply chain managers.
-- Warehouse supervisors responsible for inventory accuracy.
-- Operations analysts building recurring inventory reports.
-- Small and medium-sized businesses managing multiple stores.
-- Consultants creating inventory visibility for growing retail operations.
-
-This workbook is **not** intended to replace enterprise ERP or warehouse management systems that require real-time transaction locking, barcode scanning, purchasing automation, or high-volume concurrent data entry.
-
-No spreadsheet expertise is required.
-
-Open the browser edition or download the Excel workbook, import operational transactions, and begin reviewing inventory movements immediately.
+| Typical Retail Supply Chain Challenge | Manual Spreadsheet Limitations | Event-Driven Ledger Solution |
+|---------------------------------------|--------------------------------|------------------------------|
+| **Phantom Stock & Balance Drift** | Manual adjustments permanently overwrite history, making historical stock discrepancies impossible to audit. | Every movement remains traceable as an immutable business event, creating a bulletproof audit trail. |
+| **Flawed Replenishment Algorithms** | Purchasing decisions rely exclusively on isolated warehouse balances, causing retail overstock. | Central warehouse and decentralized store inventory are evaluated holistically prior to issuing POs. |
+| **Delayed Shrinkage Detection** | Inventory shrinkage accumulates invisibly until the dreaded month-end physical cycle count. | Waste/Merma is categorized by operational cause (damage, theft) and quantified continuously in real-time. |
+| **Multi-Store Scaling Complexity** | Adding new retail locations requires building new worksheet tabs and painstakingly linking fragile formulas. | New POS locations automatically populate into the dynamic multi-store matrix without any formula redesign. |
+| **Inaccurate COGS & Margin Tracking** | Stock quantities and financial unit costs are maintained in separate, unsynchronized financial files. | Inventory levels and standard cost data remain perfectly locked through standardized SKU master records. |
 
 ---
 
-# About
-
-I build lightweight analytical tools for operational decisions that become difficult once too many moving parts can no longer be understood from memory alone.
-
-Instead of asking, *"How can another dashboard be built?"*, I start with a different question:
-
-**"What information needs to exist in one place so the next operational decision becomes obvious?"**
-
-The **Inventory Operations Control Tool** is one example of that approach—transforming routine operational records into a reusable decision-support framework that helps inventory teams understand what happened before deciding what to do next.
----
-
-# Technical Details
+## Technical Details
 
 <details>
-<summary><strong>For technical reviewers, Excel practitioners, and collaborators</strong></summary>
+<summary><strong>For Data Analysts, Excel Practitioners, and Supply Chain Architects</strong></summary>
 
 ---
 
-## Workbook Architecture
+### Ledger Data Architecture
 
-The workbook separates operational data entry from inventory calculations. Users record business events only once, while inventory positions are reconstructed automatically from those events.
+The template enforces strict separation between data entry (inputs) and inventory calculation (outputs). 
 
 ```text
-Parameters
-Product Master
+Parameters & Product Master Data
         │
         ▼
 ──────────────────────────────────────
-Operational Event Tables
+Operational Event Data Ingestion
 ──────────────────────────────────────
-Bulk Receiving
-Breakdown & Production
-Waste (Merma)
-Warehouse Transfers
-Store Sales
+Bulk Receiving Log
+Production & SKU Breakdown
+Shrinkage & Waste (Merma)
+Warehouse to Store Transfers
+POS Sales & Fulfillment
         │
         ▼
 ──────────────────────────────────────
-Calculation Engines
+Dynamic Calculation Engines
 ──────────────────────────────────────
-Warehouse Inventory Engine
-Store Inventory Engine
+Warehouse Inventory Array Engine
+Retail Store Matrix Engine
         │
         ▼
 ──────────────────────────────────────
-Management Dashboard
+Management Dashboard UI
 ──────────────────────────────────────
-KPI Cards
-Inventory Health
-Sales Performance
-Waste Analysis
-Inventory Valuation
+Automated KPI Cards
+Safety Stock & Inventory Health
+Omnichannel Sales Performance
+Financial Valuation & COGS
+
 ```
 
-| Layer | Worksheets | Responsibility |
-|---------|------------|----------------|
-| Configuration | Parameters, Product Master | Standardize master data and validation lists |
-| Transaction Input | Receiving, Breakdown, Waste, Transfers, Sales | Record operational events only |
-| Calculation | Warehouse Inventory Engine, Store Inventory Engine | Reconstruct inventory automatically |
-| Reporting | Dashboard | Present KPIs and operational insights |
+Data flows strictly in one direction: **Configuration → Business Events → Inventory Engine → Dashboard**.
 
-Data always flows in one direction:
+### Technical Formula Reference (Excel Engine)
 
-**Configuration → Business Events → Inventory Engine → Dashboard**
+* **SKU Generation:** `Model & "-" & Color & "-" & Size` (Creates unique primary keys)
+* **Cost Retrieval:** `XLOOKUP()` (Binds standard cost to transaction data)
+* **Receiving Estimation:** `Box Qty × Pieces per Box`
 
----
+* **Dynamic SKU & Store Lists:** Utilizes `UNIQUE()` and `FILTER()` to automatically expand the tracking matrix as new products or stores are introduced.
+* **Cross-Tabulation Matrix:** Utilizes `TRANSPOSE()` to pivot stores against SKUs.
+* **Event Aggregation:** Uses robust `SUMIFS()` logic to calculate combinations of `Production - Transfers - Waste - Sales` across specific location/SKU intersections.
 
-## Three Traps That Catch Even Experienced Inventory Managers
-
-### Trap 1 — Treating Warehouse Inventory as Company Inventory
-
-A replenishment order is created because warehouse inventory appears low.
-
-The decision relies on warehouse stock only.
-
-Meanwhile, several stores still hold significant inventory that has not yet been sold.
-
-| Wrong Assumption | Correct Interpretation |
-|-----------------|-----------------------|
-| Warehouse inventory equals available inventory. | Company inventory equals warehouse inventory plus every retail location. |
-
-Before
-
-```text
-Warehouse
-SKU-A = 12 pcs
-
-Decision:
-Purchase immediately.
-```
-
-After
-
-```text
-Warehouse = 12
-
-Store A = 31
-
-Store B = 18
-
-Company Total = 61
-
-Decision:
-Transfer inventory instead of purchasing.
-```
-
-The event-driven model reconstructs inventory across all locations before recommending replenishment.
-
-<details>
-<summary>Formula logic</summary>
-
-```excel
-Warehouse Stock
-=
-Production
--
-Transfers
--
-Warehouse Waste
-
-Company Inventory
-=
-Warehouse
-+
-SUM(All Store Inventory)
-```
+* **Foreign Key Enforcement:** SKUs, Store IDs, and Waste Types must exist in the Parameters/Master Data, preventing fatal typo-driven inventory errors.
+* **Data Type Rules:** Transfer and Sales quantities are restricted to positive integers to prevent mathematical logic breaks (e.g., negative physical stock).
 
 </details>
 
 ---
 
-### Trap 2 — Assuming Inventory Loss Happens Only During Physical Counts
+## The Business Logic & Methodology
 
-Inventory appears accurate until month-end.
+At its core, this tool abandons the traditional "balance-overwrite" habit common in Excel inventory management, replacing it with **Event-Sourced Accounting** principles. By treating physical supply chain movements as immutable data events, the system resolves structural business problems that typically force scaling companies into premature and expensive ERP upgrades. 
 
-A physical count suddenly reveals missing inventory.
+Here is the exact methodology used to solve critical retail and maquila inventory challenges:
 
-Without operational history there is no evidence explaining where the loss occurred.
+### 1. Methodology: Event-Driven State Reconstruction
+- **The Business Problem (Phantom Stock & Audit Failure):** When warehouse staff manually overwrite spreadsheet cells to update current stock, the historical context of *why* the number changed is permanently destroyed. This creates untraceable discrepancies between the ledger and the physical count.
+- **The Logic:** This system utilizes an append-only architecture. Every physical movement—Bulk Receiving, Production Breakdown, Warehouse Transfer, or POS Sale—is logged as an independent, immutable event. The current inventory balance is never manually typed; it is dynamically reconstructed by calculating the net sum of these historical events.
+- **The Result (100% Auditability):** Supply chain managers gain a bulletproof audit trail. If a physical stock count fails to match the system, management can trace every transaction chronologically to pinpoint the exact operational failure (e.g., a missing transfer log or an unrecorded sale).
 
-| Wrong Approach | Correct Approach |
-|----------------|-----------------|
-| Investigate only after stock discrepancies appear. | Record every waste event when it occurs. |
+### 2. Methodology: Global-to-Local Stock Aggregation Matrix
+- **The Business Problem (Working Capital Misallocation):** Purchasing managers often issue new Purchase Orders (POs) simply because the central warehouse is empty, completely ignoring excess stock sitting idle in decentralized retail branches. This traps valuable working capital in unnecessary overstock.
+- **The Logic:** The calculation engine decouples the *inventory asset* from the *storage location*. It generates a real-time cross-tabulation matrix that evaluates local store inventory (node-level) against global company inventory (network-level) simultaneously.
+- **The Result (Omnichannel Optimization):** Operations teams can execute strategic inventory rebalancing. Before deploying cash to manufacture net-new goods, management can trigger lateral store-to-store transfers or liquidate dead stock from slow-moving locations.
 
-Before
-
-```text
-Month End
-
-Inventory Difference
-
--148 units
-
-Cause:
-Unknown
-```
-
-After
-
-```text
-Production Defect
-
-42
-
-Transit Damage
-
-35
-
-Store Theft
-
-28
-
-Warehouse Damage
-
-43
-```
-
-Management can immediately identify operational weaknesses rather than investigating historical balances.
-
-<details>
-<summary>Formula logic</summary>
-
-```excel
-Loss Value
-
-=
-Quantity
-
-×
-
-Unit Cost
-```
-
-</details>
+### 3. Methodology: Root-Cause Shrinkage (Merma) Attribution
+- **The Business Problem (Invisible Margin Erosion):** Most SMBs treat inventory loss as a generic "cost of doing business," only discovering the financial impact during month-end reconciliation when it is too late to fix.
+- **The Logic:** Shrinkage is removed from the shadows and recorded as specific operational events tied directly to standard unit costs (COGS). Losses are explicitly categorized by root cause: Production Defects (Maquila), Transit Damage (Logistics), or Retail Theft (Store Operations).
+- **The Result (Actionable Loss Prevention):** Instead of accepting a generic margin hit, financial controllers can identify exactly where value is leaking. If a specific production batch yields high defects, or a specific transport route shows high transit damage, management can intervene immediately based on quantified financial data.
 
 ---
 
-### Trap 3 — Correct Inventory Balance, Wrong Operational Decision
+## Explore More Supply Chain & Financial Frameworks
 
-The inventory number itself is technically correct.
+If you found this operational template valuable, explore my other decision-support toolkits designed for operators and analysts:
 
-The interpretation is not.
+* **Manufacturing Labor Cost & Capacity Planning Toolkit** — Analyze workforce efficiency, production capacity bottlenecks, and unit manufacturing costs.
+* **Cross-Border DTC Inventory Governance Console** — Optimize replenishment routing and global stock allocation across international fulfillment networks.
+* **Personal & Business Unified Budget Framework** — Manage personal wealth and SMB cash flow within one integrated financial model.
+* **Residential Transitional Loan Sizer & Pricer** — Evaluate real estate lending scenarios, capital structures, and project feasibility metrics.
 
-Sales increase rapidly.
-
-Management schedules additional production.
-
-However, demand increased only because one store received an unusually large transfer last week.
-
-Sales are healthy, but company inventory remains sufficient.
-
-| Incorrect Decision | Correct Decision |
-|--------------------|-----------------|
-| Increase production. | Rebalance inventory between stores first. |
-
-Inventory balances should always be interpreted together with transfers, sales and operational events rather than as isolated quantities.
-
-<details>
-<summary>Formula logic</summary>
-
-```excel
-Store Inventory
-
-=
-Transfers In
-
--
-
-Sales
-
--
-
-Store Waste
-```
-
-</details>
-
----
-
-## Example Scenario
-
-A clothing retailer receives **40 cartons** containing **50 pieces per carton**.
-
-Total estimated inventory:
-
-```text
-40 × 50 = 2,000 pieces
-```
-
-After quality inspection:
-
-- 1,950 pieces become sellable inventory.
-- 50 pieces are rejected during production.
-
-The warehouse distributes inventory:
-
-| Destination | Quantity |
-|-------------|---------:|
-| Store A | 700 |
-| Store B | 500 |
-| Warehouse | 750 |
-
-During the following week:
-
-- Store A sells 420 pieces.
-- Store B sells 280 pieces.
-- Warehouse records 15 damaged units.
-- Store B records 8 stolen items.
-
-Instead of reporting only current inventory balances, the workbook reconstructs the complete operational picture.
-
-Management immediately understands:
-
-- where inventory entered the business,
-- where losses occurred,
-- which stores are selling fastest,
-- whether shortages require purchasing or redistribution,
-- how much inventory value remains tied up in stock.
-
-The recommendation becomes operational rather than reactive.
-
-Rather than manufacturing another production batch, management can first transfer inventory from slower-moving locations while simultaneously investigating production quality losses.
-
----
-
-### Formula Reference
-
-<details>
-<summary>Product Master</summary>
-
-| Formula | Purpose |
-|---------|---------|
-| `Model & "-" & Color & "-" & Size` | Generate unique SKU keys |
-| `XLOOKUP()` | Retrieve standard cost information |
-
-</details>
-
-<details>
-<summary>Receiving</summary>
-
-| Formula | Purpose |
-|---------|---------|
-| `Box Qty × Pieces per Box` | Calculate estimated received quantity |
-
-</details>
-
-<details>
-<summary>Breakdown & Production</summary>
-
-| Formula | Purpose |
-|---------|---------|
-| `XLOOKUP()` | Retrieve SKU cost |
-| SKU concatenation | Standardize inventory identity |
-
-</details>
-
-<details>
-<summary>Waste</summary>
-
-| Formula | Purpose |
-|---------|---------|
-| `Quantity × Unit Cost` | Calculate financial loss |
-
-</details>
-
-<details>
-<summary>Warehouse Inventory Engine</summary>
-
-| Formula | Purpose |
-|---------|---------|
-| `UNIQUE()` | Generate dynamic SKU list |
-| `SUMIFS()` | Aggregate production quantities |
-| `SUMIFS()` | Aggregate warehouse transfers |
-| `SUMIFS()` | Aggregate warehouse waste |
-| Final Balance | Production − Transfers − Waste |
-
-</details>
-
-<details>
-<summary>Store Inventory Engine</summary>
-
-| Formula | Purpose |
-|---------|---------|
-| `FILTER()` | Build dynamic store list |
-| `TRANSPOSE()` | Create store matrix |
-| `SUMIFS()` | Calculate inventory for every Store × SKU combination |
-
-</details>
-
----
-
-### Validation Rules
-
-| Field | Rule | Error Behavior |
-|--------|------|----------------|
-| SKU | Must exist in Product Master | Lookup returns blank or `#N/A` |
-| Store | Must exist in Parameters | Validation rejects invalid values |
-| Waste Type | Must exist in Parameters | Invalid category prevented |
-| Transfer Quantity | Positive integer only | Inventory calculation becomes incorrect if violated |
-| Sales Quantity | Positive integer only | Negative inventory may appear |
-| Unit Cost | Required for valuation | Inventory value cannot be calculated |
-| Duplicate SKU Keys | Not permitted | Reporting inconsistencies |
-| Blank Product Attributes | Not permitted | SKU generation fails |
-
-</details>
-
----
-
-## Other Tools in This Series
-
-- Manufacturing Labor Cost & Capacity Planning Toolkit — Analyze labor efficiency, production capacity, and unit manufacturing cost.
-- Cross-Border DTC Inventory Governance Console — Improve replenishment and inventory allocation across international fulfillment networks.
-- Personal & Business Unified Budget Framework — Manage personal and business cash flow within one integrated financial model.
-- Residential Transitional Loan Sizer & Pricer — Evaluate lending scenarios, funding structures, and project feasibility.
-
-More decision-support templates will be published through this GitHub profile and Gumroad store.
+Follow my GitHub profile and Gumroad store for upcoming product launches.
 
 ---
 
 ## License
 
-This project is released under the **Apache License 2.0**.
-
-You are free to use, modify, and distribute this project in accordance with the terms of the Apache License 2.0.
+This software project and accompanying documentation are released under the **Apache License 2.0**. You are free to use, modify, and distribute this toolkit in accordance with the terms of the Apache 2.0 open-source license.
