@@ -9,7 +9,7 @@
 
 **No signup. No installation. Ready to use in your browser.**
 
-Test the event-driven logic via the free web app. For ongoing, offline business operations, upgrade to the fully customizable Excel version (backed by a 7-day money-back guarantee).
+Test the event-driven logic via the free web app. For ongoing, offline business operations, upgrade to the fully customizable Excel version (backed by a 30-day, no-questions-asked money-back guarantee).
 
 > 🌐 **Test the Live Demo**  
 > [*Launch Free Web-Based Retail Inventory Tracker Dashboard*](https://hyvoid.github.io/Retail-and-Maquila-Inventory-Ledger/)
