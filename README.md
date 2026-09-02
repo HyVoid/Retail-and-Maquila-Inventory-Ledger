@@ -197,7 +197,7 @@ If you found this operational template valuable, explore my other decision-suppo
 * **Personal & Business Unified Budget Framework** — Manage personal wealth and SMB cash flow within one integrated financial model.
 * **Residential Transitional Loan Sizer & Pricer** — Evaluate real estate lending scenarios, capital structures, and project feasibility metrics.
 
-Follow my GitHub profile and Gumroad store for upcoming product launches.
+Follow my GitHub profile and visit our [Website](https://www.theseusworkshop.com/) for upcoming product launches.
 
 ---
 
