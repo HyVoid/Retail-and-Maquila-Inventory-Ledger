@@ -66,7 +66,7 @@ Navigate directly to the inventory engines or the visual management dashboard. T
 ### 4. Refresh & Repeat (Continuous Replenishment Cycle)
 Repeat the data import process daily, weekly, or monthly based on your fulfillment cycle. No redesigning files. No rebuilding broken links. Simply append new business events and refresh. 
 
-> 🚀 **Take Action:** Ready to standardize your operations? Once you've validated your business logic in the free browser trial, **[Download the Excel Inventory Template](https://www.theseusworkshop.com/l/zllojx)**. Keep it locally to build a secure, repeatable, and permanent offline supply chain database for your business.
+> 🚀 **Take Action:** Ready to standardize your operations? Once you've validated your business logic in the free browser trial, **[Download the Excel Inventory Template](https://www.theseusworkshop.com/l/zllojx?utm_source=github&utm_medium=GitHub%20README&utm_campaign=readme%20new%20launch&utm_content=retail-maquila-inventory-ledger)**. Keep it locally to build a secure, repeatable, and permanent offline supply chain database for your business.
 
 ---
 
