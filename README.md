@@ -1,3 +1,5 @@
+[ 🌐 عربي ](README.ar.md) | [ 🇪🇸 Español ](README.sp.md) | [ 🇬🇧 English ](README.md)
+
 # Retail and Maquila Inventory Ledger: Multi-Store Excel Template & Web Tracker
 ### Event-Driven Inventory Tracking and Decision Support System for Retail, eCommerce, & Apparel Supply Chains
 
