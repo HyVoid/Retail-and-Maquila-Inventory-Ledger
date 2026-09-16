@@ -1,4 +1,4 @@
-[ 🌐 عربي ](README.ar.md) | [ 🇪🇸 Español ](README.sp.md) | [ 🇬🇧 English ](README.md)
+[ 🌐 عربي ](README.ar.md) | [ 🇩🇪 Deutsch ](README.de.md) | [ 🇳🇱 Nederlands ](README.nl.md) | [ 🇪🇸 Español ](README.sp.md) | [ 🇬🇧 English ](README.md)
 
 # Libro Mayor de Inventario para Retail y Maquila: Plantilla de Excel Multitienda y Rastreador Web
 ### Sistema de Seguimiento de Inventario Orientado a Eventos y Soporte para la Toma de Decisiones para Cadenas de Suministro de Retail, Comercio Electrónico e Indumentaria
