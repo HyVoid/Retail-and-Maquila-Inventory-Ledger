@@ -1,4 +1,4 @@
-[ 🌐 عربي ](README.ar.md) | [ 🇪🇸 Español ](README.sp.md) | [ 🇬🇧 English ](README.md)
+[ 🌐 عربي ](README.ar.md) | [ 🇩🇪 Deutsch ](README.de.md) | [ 🇳🇱 Nederlands ](README.nl.md) | [ 🇪🇸 Español ](README.sp.md) | [ 🇬🇧 English ](README.md)
 
 # سجل مخزون التجزئة والماكيلا: قالب Excel متعدد المتاجر ومتتبع عبر الويب
 ### نظام تتبع المخزون المدفوع بالأحداث ودعم القرار للتجزئة والتجارة الإلكترونية وسلاسل توريد الملابس
