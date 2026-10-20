@@ -1,6 +1,8 @@
 [ 🌐 عربي ](README.ar.md) | [ 🇩🇪 Deutsch ](README.de.md) | [ 🇫🇷 Français ](README.fr.md) | [ 🇳🇱 Nederlands ](README.nl.md) | [ 🇪🇸 Español ](README.sp.md) | [ 🇬🇧 English ](README.md)
 
 # Retail and Maquila Inventory Ledger: Multi-Store Excel Template & Web Tracker
+<img width="1077" height="790" alt="image" src="https://github.com/user-attachments/assets/196b41b4-828c-487f-a5cd-2a9eba684c52" />
+
 ### Event-Driven Inventory Tracking and Decision Support System for Retail, eCommerce, & Apparel Supply Chains
 
 ![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)
@@ -169,24 +171,23 @@ Data flows strictly in one direction: **Configuration → Business Events → In
 
 ## The Business Logic & Methodology
 
-At its core, this tool abandons the traditional "balance-overwrite" habit common in Excel inventory management, replacing it with **Event-Sourced Accounting** principles. By treating physical supply chain movements as immutable data events, the system resolves structural business problems that typically force scaling companies into premature and expensive ERP upgrades. 
+The **Inventory Operations Control Tool** uses an event-driven inventory management methodology to help retail and apparel businesses maintain accurate stock visibility across warehouses and stores. Instead of manually updating inventory balances, the method reconstructs stock positions from recorded business activities, including receiving, production, warehouse transfers, sales, and inventory losses.
 
-Here is the exact methodology used to solve critical retail and maquila inventory challenges:
+This approach connects inventory tracking with operational decision-making. It helps businesses distinguish genuine stock shortages from inventory allocation problems, identify where shrinkage occurs, and understand how inventory movements affect stock availability and working capital.
 
-### 1. Methodology: Event-Driven State Reconstruction
-- **The Business Problem (Phantom Stock & Audit Failure):** When warehouse staff manually overwrite spreadsheet cells to update current stock, the historical context of *why* the number changed is permanently destroyed. This creates untraceable discrepancies between the ledger and the physical count.
-- **The Logic:** This system utilizes an append-only architecture. Every physical movement—Bulk Receiving, Production Breakdown, Warehouse Transfer, or POS Sale—is logged as an independent, immutable event. The current inventory balance is never manually typed; it is dynamically reconstructed by calculating the net sum of these historical events.
-- **The Result (100% Auditability):** Supply chain managers gain a bulletproof audit trail. If a physical stock count fails to match the system, management can trace every transaction chronologically to pinpoint the exact operational failure (e.g., a missing transfer log or an unrecorded sale).
+### How the Methodology Solves Inventory Management Problems
 
-### 2. Methodology: Global-to-Local Stock Aggregation Matrix
-- **The Business Problem (Working Capital Misallocation):** Purchasing managers often issue new Purchase Orders (POs) simply because the central warehouse is empty, completely ignoring excess stock sitting idle in decentralized retail branches. This traps valuable working capital in unnecessary overstock.
-- **The Logic:** The calculation engine decouples the *inventory asset* from the *storage location*. It generates a real-time cross-tabulation matrix that evaluates local store inventory (node-level) against global company inventory (network-level) simultaneously.
-- **The Result (Omnichannel Optimization):** Operations teams can execute strategic inventory rebalancing. Before deploying cash to manufacture net-new goods, management can trigger lateral store-to-store transfers or liquidate dead stock from slow-moving locations.
+- **Event-Driven Inventory Tracking:** Records every stock movement as a separate operational event instead of overwriting inventory balances. This makes inventory discrepancies easier to investigate and helps managers trace stock changes back to receiving, production, transfers, sales, or waste.
 
-### 3. Methodology: Root-Cause Shrinkage (Merma) Attribution
-- **The Business Problem (Invisible Margin Erosion):** Most SMBs treat inventory loss as a generic "cost of doing business," only discovering the financial impact during month-end reconciliation when it is too late to fix.
-- **The Logic:** Shrinkage is removed from the shadows and recorded as specific operational events tied directly to standard unit costs (COGS). Losses are explicitly categorized by root cause: Production Defects (Maquila), Transit Damage (Logistics), or Retail Theft (Store Operations).
-- **The Result (Actionable Loss Prevention):** Instead of accepting a generic margin hit, financial controllers can identify exactly where value is leaking. If a specific production batch yields high defects, or a specific transport route shows high transit damage, management can intervene immediately based on quantified financial data.
+- **Multi-Location Inventory Reconciliation:** Evaluates warehouse stock and individual store inventory together. When warehouse inventory runs low while other stores retain excess stock, managers can consider internal stock transfers before placing unnecessary replenishment orders.
+
+- **SKU-Level Inventory Control:** Standardizes product variants by model, color, and size. Consistent SKU identification improves inventory accuracy, reduces reporting mismatches, and makes it easier to compare stock availability across locations.
+
+- **Inventory Shrinkage and Waste Analysis:** Categorizes inventory losses by location and operational cause, such as production defects, transit damage, or store theft. Quantifying losses in financial terms helps managers identify recurring problems and prioritize corrective action.
+
+- **Sales and Inventory Performance Analysis:** Connects retail sales with stock depletion and remaining inventory. Managers can identify fast-moving products, slow-moving stock, potential shortages, and redistribution opportunities before committing additional purchasing or production resources.
+
+Together, these methods turn routine inventory records into a practical inventory control and decision-support process. The objective is not simply to report how much stock remains, but to explain **where inventory went, why stock positions changed, and what operational action should come next**.
 
 ---
 
