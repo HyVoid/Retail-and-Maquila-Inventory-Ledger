@@ -1,21 +1,26 @@
-@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
 @import "tailwindcss";
 
 :root {
-  /* ── Core Palette ── */
-  --color-primary:    #051C2C;
-  --color-accent:     #2251FF;
-  --color-bg:         #F5F5F2;
-  --color-muted:      #888888;
+  /* ── Specification Palette ── */
+  --bg:               #F5F5F2;
+  --surface:          #FFFFFF;
+  --brand:            #051C2C;
+  --accent:           #2251FF;
+  --muted:            #888888;
+  --ok:               #00C853;
+  --danger:           #D32F2F;
+  --input-bg:         #FFFDE7;
+
+  /* Aliases & Semantic */
+  --color-primary:    var(--brand);
+  --color-accent:     var(--accent);
+  --color-bg:         var(--bg);
+  --color-surface:    var(--surface);
+  --color-muted:      var(--muted);
+  --color-positive:   var(--ok);
+  --color-negative:   var(--danger);
+  --color-input-bg:   var(--input-bg);
   --color-body-text:  #1A1A2E;
-  
-  /* Semantic */
-  --color-positive:   #00C853;   /* met/exceeded target threshold — rare */
-  --color-negative:   #D32F2F;   /* anomaly requiring action — rare     */
-  
-  /* Surface */
-  --color-surface:    #FFFFFF;
-  --color-input-bg:   #FFFDE7;   /* pale yellow for editable fields */
   --color-border:     #E8E8E6;
   
   /* Navigation */

@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - master
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -16,12 +17,14 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node.js 22
         uses: actions/setup-node@v4
         with:
-          node-version: 20
-          # We do not include cache: 'npm' here to prevent the "Dependencies lock file is not found" error
-          # when there is no package-lock.json.
+          node-version: 22
+          # Note: No cache parameter specified to avoid lock file missing errors
+
+      - name: Verify Node.js Version
+        run: node --version
 
       - name: Install Dependencies
         run: |

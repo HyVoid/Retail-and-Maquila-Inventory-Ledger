@@ -41,7 +41,9 @@ import {
   HelpCircle,
   FileSpreadsheet,
   Layers,
-  ChevronRight
+  ChevronRight,
+  Menu,
+  X
 } from 'lucide-react';
 
 const LOCAL_STORAGE_KEY = 'multi_store_retail_maquila_state_v2';
@@ -64,6 +66,7 @@ export default function App() {
 
   // Active navigation tab
   const [activeTab, setActiveTab] = useState<string>('dashboard');
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState<boolean>(false);
 
   // Trigger loading from localStorage on mount
   useEffect(() => {
@@ -247,7 +250,7 @@ export default function App() {
     const now = new Date();
     const dateStr = now.toISOString().slice(0, 10);
     link.href = url;
-    link.download = `supply-chain-ledger-backup-${dateStr}.json`;
+    link.download = `retail-and-maquila-inventory-ledger-backup-${dateStr}.json`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -342,83 +345,244 @@ export default function App() {
     }
   };
 
+  const navTabs = [
+    { id: 'dashboard', label: 'Executive Dashboard', icon: Activity, subtitle: 'BI & Growth Review' },
+    { id: 'ledger', label: 'Excel Calculation Engines', icon: FileSpreadsheet, subtitle: 'Real-time Math Models' },
+    { id: 'arrivals', label: 'Bulk Receiving', icon: Download, subtitle: 'tbl_Receiving' },
+    { id: 'maquila', label: 'Breakdown Production', icon: RefreshCw, subtitle: 'tbl_Breakdown' },
+    { id: 'transfers', label: 'Warehouse Transfers', icon: ArrowLeftRight, subtitle: 'tbl_Transfers' },
+    { id: 'sales', label: 'Store Sales Log', icon: TrendingUp, subtitle: 'tbl_Sales' },
+    { id: 'config', label: 'Product Master / Params', icon: Settings, subtitle: 'SKU Specs & Rates' }
+  ];
+
   return (
-    <div className="min-h-screen flex flex-col bg-[#F5F5F2] text-slate-800 selection:bg-accent/20">
+    <div className="min-h-screen flex flex-col md:flex-row bg-[#F5F5F2] text-slate-800 selection:bg-accent/20">
       
-      {/* Horizontal Sticky Top Nav Bar */}
-      <header className="sticky top-0 z-40 h-[56px] bg-white border-b border-slate-200 shadow-sm px-6 flex items-center justify-between">
-        
-        {/* Left Side: Brand Identity */}
-        <div className="flex items-center gap-2">
-          <div className="brand font-display text-[18px] font-black text-primary tracking-tight flex items-center gap-1.5 uppercase">
-            <span className="p-1 bg-primary text-white rounded font-mono text-xs">RM</span>
-            <span>Retail and Maquila Inventory Ledger</span>
-          </div>
-          <span className="text-xs text-[#888888] font-mono border-l border-slate-200 pl-3 hidden lg:inline">
-            Event-Driven Inventory Engine
+      {/* Mobile Top Header */}
+      <header className="md:hidden sticky top-0 z-40 bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between shadow-xs">
+        <div className="flex items-center gap-2.5">
+          <span className="w-7 h-7 rounded-md bg-[var(--brand)] text-white flex items-center justify-center font-bold text-xs tracking-wider shadow-xs">
+            TW
           </span>
+          <div>
+            <span className="font-display text-[16px] font-bold text-[var(--brand)] tracking-tight leading-none block">
+              Theseus Workshop
+            </span>
+            <span className="text-[10px] font-medium text-slate-500 block leading-none mt-0.5">
+              Retail and Maquila Inventory Ledger
+            </span>
+          </div>
         </div>
 
-        {/* Center: Tabs Switcher */}
-        <nav className="hidden md:flex items-center gap-6 h-full">
-          {[
-            { id: 'dashboard', label: 'Executive Dashboard', icon: Activity },
-            { id: 'ledger', label: 'Excel Calculation Engines', icon: FileSpreadsheet },
-            { id: 'arrivals', label: 'Bulk Receiving', icon: Download },
-            { id: 'maquila', label: 'Breakdown Production', icon: RefreshCw },
-            { id: 'transfers', label: 'Warehouse Transfers', icon: ArrowLeftRight },
-            { id: 'sales', label: 'Store Sales Log', icon: TrendingUp },
-            { id: 'config', label: 'Product Master / Params', icon: Settings }
-          ].map(tab => {
+        <button
+          onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
+          className="p-2 rounded-lg text-slate-600 hover:text-[var(--brand)] hover:bg-slate-100 cursor-pointer"
+          aria-label="Toggle navigation menu"
+        >
+          {mobileSidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+        </button>
+      </header>
+
+      {/* Mobile Drawer Backdrop & Sidebar */}
+      {mobileSidebarOpen && (
+        <div className="fixed inset-0 z-50 md:hidden flex">
+          <div
+            className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs transition-opacity"
+            onClick={() => setMobileSidebarOpen(false)}
+          />
+          <div className="relative w-72 max-w-[85vw] bg-white h-full flex flex-col shadow-2xl z-10 animate-fadeIn">
+            {/* Drawer Header */}
+            <div className="p-4 border-b border-slate-200 flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <span className="w-7 h-7 rounded-md bg-[var(--brand)] text-white flex items-center justify-center font-bold text-xs tracking-wider shadow-xs">
+                  TW
+                </span>
+                <div>
+                  <h2 className="font-display text-[16px] font-bold text-[var(--brand)] tracking-tight leading-none">
+                    Theseus Workshop
+                  </h2>
+                  <p className="text-[10px] text-slate-500 mt-0.5 font-medium">
+                    Retail and Maquila Inventory Ledger
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setMobileSidebarOpen(false)}
+                className="p-1.5 rounded-md text-slate-400 hover:text-slate-600 hover:bg-slate-100"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Drawer Nav Items */}
+            <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+              <div className="px-3 pb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                Navigation
+              </div>
+              {navTabs.map(tab => {
+                const Icon = tab.icon;
+                const isActive = activeTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => {
+                      setActiveTab(tab.id);
+                      setMobileSidebarOpen(false);
+                    }}
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold tracking-wide transition-all text-left cursor-pointer ${
+                      isActive
+                        ? 'bg-[var(--brand)] text-white shadow-xs'
+                        : 'text-slate-600 hover:text-[var(--brand)] hover:bg-slate-100'
+                    }`}
+                  >
+                    <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-[var(--accent)]' : 'text-slate-400'}`} />
+                    <div className="flex-1 min-w-0">
+                      <div className="truncate">{tab.label}</div>
+                      <div className={`text-[10px] truncate ${isActive ? 'text-slate-300' : 'text-slate-400'}`}>
+                        {tab.subtitle}
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </nav>
+
+            {/* Drawer Footer Actions */}
+            <div className="p-4 border-t border-slate-100 bg-slate-50/70 space-y-2">
+              {state.lastSaved && (
+                <div className="text-[10px] text-slate-500 flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <span>Synced: {state.lastSaved}</span>
+                </div>
+              )}
+              <div className="grid grid-cols-3 gap-1.5 pt-1">
+                <button
+                  onClick={handleExportBackup}
+                  className="flex flex-col items-center justify-center p-2 rounded-lg border border-slate-200 bg-white text-slate-700 text-[10px] font-semibold"
+                >
+                  <Download className="w-3.5 h-3.5 mb-1 text-slate-500" />
+                  <span>Export</span>
+                </button>
+                <label className="flex flex-col items-center justify-center p-2 rounded-lg border border-slate-200 bg-white text-slate-700 text-[10px] font-semibold cursor-pointer">
+                  <Upload className="w-3.5 h-3.5 mb-1 text-slate-500" />
+                  <span>Import</span>
+                  <input type="file" accept=".json" onChange={handleImportBackup} className="hidden" />
+                </label>
+                <button
+                  onClick={handleResetData}
+                  className="flex flex-col items-center justify-center p-2 rounded-lg border border-red-200 bg-red-50 text-red-700 text-[10px] font-semibold"
+                >
+                  <RefreshCw className="w-3.5 h-3.5 mb-1 text-red-600" />
+                  <span>Reset</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Desktop Vertical Sidebar */}
+      <aside className="hidden md:flex flex-col w-64 lg:w-72 bg-white border-r border-slate-200 h-screen sticky top-0 shrink-0 z-30 select-none">
+        
+        {/* Brand Header */}
+        <div className="p-5 border-b border-slate-100">
+          <div className="flex items-center gap-3">
+            <span className="w-9 h-9 rounded-lg bg-[var(--brand)] text-white flex items-center justify-center font-bold text-sm tracking-wider shadow-sm shrink-0">
+              TW
+            </span>
+            <div className="min-w-0">
+              <h1 className="font-display text-[18px] font-bold text-[var(--brand)] tracking-tight leading-none truncate">
+                Theseus Workshop
+              </h1>
+              <p className="text-[11px] font-semibold text-slate-600 truncate mt-1">
+                Retail and Maquila Inventory Ledger
+              </p>
+            </div>
+          </div>
+          <div className="mt-2.5 pt-2 border-t border-slate-100 text-[10px] text-[var(--muted)] leading-tight">
+            Multi-Store Inventory & Maquila Breakdown Engine
+          </div>
+        </div>
+
+        {/* Sidebar Vertical Navigation Links */}
+        <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+          <div className="px-3 pb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+            Ledger Modules
+          </div>
+          {navTabs.map(tab => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
             return (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`h-full flex items-center gap-2 border-b-2 text-xs font-bold tracking-wide transition-all cursor-pointer relative ${
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold tracking-wide transition-all text-left cursor-pointer group ${
                   isActive
-                    ? 'border-accent text-accent'
-                    : 'border-transparent text-slate-500 hover:text-primary'
+                    ? 'bg-[var(--brand)] text-white shadow-xs'
+                    : 'text-slate-600 hover:text-[var(--brand)] hover:bg-slate-100/80'
                 }`}
               >
-                <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-accent' : 'text-slate-400'}`} />
-                <span>{tab.label}</span>
+                <Icon
+                  className={`w-4 h-4 shrink-0 transition-colors ${
+                    isActive ? 'text-[var(--accent)]' : 'text-slate-400 group-hover:text-[var(--brand)]'
+                  }`}
+                />
+                <div className="flex-1 min-w-0">
+                  <div className="truncate">{tab.label}</div>
+                  <div
+                    className={`text-[10px] truncate ${
+                      isActive ? 'text-slate-300' : 'text-slate-400'
+                    }`}
+                  >
+                    {tab.subtitle}
+                  </div>
+                </div>
                 {isActive && (
-                  <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)] shrink-0" />
                 )}
               </button>
             );
           })}
         </nav>
 
-        {/* Right Side: Saved Status, Import/Export/Reset buttons */}
-        <div className="flex items-center gap-4 text-xs">
-          {/* Last Saved Pill */}
-          {state.lastSaved && (
-            <div className="hidden sm:flex items-center gap-1.5 bg-slate-50 text-slate-500 border border-slate-200 px-2.5 py-1 rounded-full text-[10px] font-bold">
-              <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-pulse" />
-              <span>Synced: {state.lastSaved}</span>
+        {/* Bottom Persistence & Quick Actions Card */}
+        <div className="p-4 border-t border-slate-100 bg-slate-50/70 space-y-3">
+          
+          {/* Storage Sync Indicator */}
+          <div className="bg-white border border-slate-200/80 rounded-lg p-2.5 shadow-2xs">
+            <div className="flex items-center justify-between text-[11px]">
+              <span className="text-slate-500 font-medium">Persistence</span>
+              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                Browser LocalStorage
+              </span>
             </div>
-          )}
+            {state.lastSaved && (
+              <div className="mt-1 text-[10px] text-slate-400 truncate">
+                Last saved: <span className="font-mono text-slate-600 font-semibold">{state.lastSaved}</span>
+              </div>
+            )}
+          </div>
 
-          {/* Action Operations */}
-          <div className="flex items-center gap-1.5">
+          {/* Quick Action Buttons */}
+          <div className="grid grid-cols-3 gap-1.5">
             {/* Export Backup */}
             <button
               onClick={handleExportBackup}
-              className="p-1.5 hover:bg-slate-100 rounded text-slate-500 hover:text-primary transition-colors cursor-pointer"
-              title="Export Local Backup JSON"
+              className="flex flex-col items-center justify-center p-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 text-[10px] font-semibold transition-colors cursor-pointer group"
+              title="Export complete JSON backup file"
             >
-              <Download className="w-4 h-4" />
+              <Download className="w-3.5 h-3.5 text-slate-500 group-hover:text-[var(--accent)] mb-1" />
+              <span>Export</span>
             </button>
 
             {/* Import Backup */}
             <label
-              className="p-1.5 hover:bg-slate-100 rounded text-slate-500 hover:text-primary transition-colors cursor-pointer inline-block"
-              title="Import Backup JSON file"
+              className="flex flex-col items-center justify-center p-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 text-[10px] font-semibold transition-colors cursor-pointer group"
+              title="Import and restore from JSON backup file"
             >
-              <Upload className="w-4 h-4" />
+              <Upload className="w-3.5 h-3.5 text-slate-500 group-hover:text-[var(--accent)] mb-1" />
+              <span>Import</span>
               <input
                 type="file"
                 accept=".json"
@@ -430,92 +594,77 @@ export default function App() {
             {/* Reset Data */}
             <button
               onClick={handleResetData}
-              className="p-1.5 hover:bg-slate-100 rounded text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
-              title="Wipe and Reset to Default Demo Data"
+              className="flex flex-col items-center justify-center p-2 rounded-lg border border-red-200 bg-red-50/50 hover:bg-red-100/70 text-red-700 text-[10px] font-semibold transition-colors cursor-pointer"
+              title="Wipe and reset to initial demo data"
             >
-              <RefreshCw className="w-4 h-4" />
+              <RefreshCw className="w-3.5 h-3.5 text-red-600 mb-1" />
+              <span>Reset</span>
             </button>
           </div>
         </div>
 
-      </header>
+      </aside>
 
-      {/* Mobile Nav Helper bar */}
-      <div className="md:hidden sticky top-[56px] z-30 bg-white border-b border-slate-200 px-4 py-2 overflow-x-auto flex gap-2 shadow-sm">
-        {[
-          { id: 'dashboard', label: 'Dashboard' },
-          { id: 'ledger', label: 'Engines' },
-          { id: 'arrivals', label: 'Receiving' },
-          { id: 'maquila', label: 'Breakdown' },
-          { id: 'transfers', label: 'Transfers' },
-          { id: 'sales', label: 'Sales' },
-          { id: 'config', label: 'Master' }
-        ].map(tab => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap cursor-pointer transition-colors ${
-              activeTab === tab.id
-                ? 'bg-accent text-white'
-                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Main Container Content */}
-      <main className="flex-1 w-full max-w-[1400px] mx-auto px-6 py-8">
+      {/* Main Content Area */}
+      <div className="flex-1 min-w-0 flex flex-col min-h-screen">
         
-        {/* Dynamic header title based on Tab */}
-        <div className="mb-6 flex flex-wrap justify-between items-end gap-3 border-b border-slate-200 pb-4">
-          <div>
-            <div className="flex items-center gap-1.5 text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1 select-none">
-              <span>Retail and Maquila Inventory Ledger</span>
-              <ChevronRight className="w-3.5 h-3.5 text-slate-300" />
-              <span className="text-slate-500">
-                {activeTab === 'dashboard' && "Executive BI Screen"}
-                {activeTab === 'ledger' && "Computation Engines"}
-                {activeTab === 'arrivals' && "Receiving Logs"}
-                {activeTab === 'maquila' && "Breakdown & Production logs"}
-                {activeTab === 'transfers' && "Warehouse Dispatch"}
-                {activeTab === 'sales' && "POS Terminal Logs"}
-                {activeTab === 'config' && "Model Master Config"}
-              </span>
+        {/* Main Content Container */}
+        <main className="flex-1 w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
+          
+          {/* Dynamic Module Header & Breadcrumb */}
+          <div className="mb-6 flex flex-wrap justify-between items-end gap-3 border-b border-slate-200 pb-4">
+            <div>
+              <div className="flex items-center gap-1.5 text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1 select-none">
+                <span>Retail and Maquila Inventory Ledger</span>
+                <ChevronRight className="w-3.5 h-3.5 text-slate-300" />
+                <span className="text-slate-500">
+                  {activeTab === 'dashboard' && "Executive BI Screen"}
+                  {activeTab === 'ledger' && "Computation Engines"}
+                  {activeTab === 'arrivals' && "Receiving Logs"}
+                  {activeTab === 'maquila' && "Breakdown & Production logs"}
+                  {activeTab === 'transfers' && "Warehouse Dispatch"}
+                  {activeTab === 'sales' && "POS Terminal Logs"}
+                  {activeTab === 'config' && "Model Master Config"}
+                </span>
+              </div>
+              <h2 className="font-display text-[26px] font-black tracking-tight text-primary leading-none">
+                {activeTab === 'dashboard' && "Executive Decision Center Dashboard"}
+                {activeTab === 'ledger' && "Dynamic Excel Inventory Engines"}
+                {activeTab === 'arrivals' && "Bulk Cargo Cargo Receiving (tbl_Receiving)"}
+                {activeTab === 'maquila' && "Breakdown & Packaging Production (tbl_Breakdown)"}
+                {activeTab === 'transfers' && "Inter-Store Logistics Dispatch (tbl_Transfers)"}
+                {activeTab === 'sales' && "Store Retail Sales Ledger (tbl_Sales)"}
+                {activeTab === 'config' && "Baseline Parameters & SKU Master (tbl_Products)"}
+              </h2>
             </div>
-            <h2 className="font-display text-[26px] font-black tracking-tight text-primary leading-none">
-              {activeTab === 'dashboard' && "Executive Decision Center Dashboard"}
-              {activeTab === 'ledger' && "Dynamic Excel Inventory Engines"}
-              {activeTab === 'arrivals' && "Bulk Cargo Cargo Receiving (tbl_Receiving)"}
-              {activeTab === 'maquila' && "Breakdown & Packaging Production (tbl_Breakdown)"}
-              {activeTab === 'transfers' && "Inter-Store Logistics Dispatch (tbl_Transfers)"}
-              {activeTab === 'sales' && "Store Retail Sales Ledger (tbl_Sales)"}
-              {activeTab === 'config' && "Baseline Parameters & SKU Master (tbl_Products)"}
-            </h2>
+
+            <div className="text-right text-[10px] text-slate-400 font-mono select-none hidden lg:block bg-white border border-slate-200 px-3 py-1.5 rounded-lg shadow-2xs">
+              App State: <span className="text-primary font-bold">Client Event-Ledger</span> | Standard: <span className="text-primary font-bold">Excel-Compatible Formulas</span>
+            </div>
           </div>
 
-          <div className="text-right text-[10px] text-slate-400 font-mono select-none hidden lg:block bg-slate-100 border border-slate-200 px-3 py-1 rounded-lg">
-            App State: <span className="text-primary font-bold">Client Event-Ledger</span> | Standard: <span className="text-primary font-bold">Excel-Compatible Formulas</span>
+          {/* Tab View Container */}
+          <div className="min-h-[400px]">
+            {renderActiveTab()}
           </div>
-        </div>
 
-        {/* Tab View Container */}
-        <div className="min-h-[400px]">
-          {renderActiveTab()}
-        </div>
+        </main>
 
-      </main>
+        {/* Global Footer */}
+        <footer className="py-6 border-t border-slate-200 bg-white text-center text-[12px] text-slate-500 select-none mt-auto">
+          <div className="max-w-[1400px] mx-auto px-6 flex flex-col sm:flex-row justify-between items-center gap-3">
+            <p className="text-left text-[11px] text-slate-500">
+              All data in this tool is stored in your browser's localStorage. The page itself does not retain any user data.
+            </p>
+            <div className="flex items-center gap-2 text-[11px] text-slate-400 font-mono">
+              <span className="font-semibold text-slate-600">Theseus Workshop</span>
+              <span>&bull;</span>
+              <span>Retail and Maquila Inventory Ledger</span>
+            </div>
+          </div>
+        </footer>
 
-      {/* Footer */}
-      <footer className="py-6 border-t border-slate-200 bg-white text-center text-[11px] text-slate-400 select-none">
-        <div className="max-w-[1400px] mx-auto px-6 flex flex-wrap justify-between items-center gap-4">
-          <span>&copy; 2026 Retail Inventory Control & Maquila Logistics Panel. Excel-Driven Architecture.</span>
-          <span className="font-mono bg-slate-50 px-2.5 py-1 border border-slate-200 rounded text-slate-500">
-            System Sandbox v4.1 (React + Tailwind)
-          </span>
-        </div>
-      </footer>
+      </div>
 
     </div>
   );
