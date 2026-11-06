@@ -1,7 +1,7 @@
 [ 🌐 عربي ](README.ar.md) | [ 🇩🇪 Deutsch ](README.de.md) | [ 🇫🇷 Français ](README.fr.md) | [ 🇳🇱 Nederlands ](README.nl.md) | [ 🇪🇸 Español ](README.sp.md) | [ 🇬🇧 English ](README.md)
 
 # Retail and Maquila Inventory Ledger: Multi-Store Excel Template & Web Tracker
-<img width="1077" height="790" alt="image" src="https://github.com/user-attachments/assets/196b41b4-828c-487f-a5cd-2a9eba684c52" />
+<img width="1113" height="790" alt="image" src="https://github.com/user-attachments/assets/7b862acf-11a5-487b-a113-bab627c483f0" />
 
 
 <p align="left">
