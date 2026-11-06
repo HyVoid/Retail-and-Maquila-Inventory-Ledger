@@ -1,121 +1,158 @@
 [ 🌐 عربي ](README.ar.md) | [ 🇩🇪 Deutsch ](README.de.md) | [ 🇫🇷 Français ](README.fr.md) | [ 🇳🇱 Nederlands ](README.nl.md) | [ 🇪🇸 Español ](README.sp.md) | [ 🇬🇧 English ](README.md)
 
 # Grand livre d'inventaire pour le commerce de détail et la maquila : modèle Excel multi-magasins et traqueur web
-### Système de suivi d'inventaire et d'aide à la décision piloté par les événements pour la vente au détail, le commerce électronique et les chaînes d'approvisionnement textile
+<img width="1113" height="790" alt="image" src="https://github.com/user-attachments/assets/7b862acf-11a5-487b-a113-bab627c483f0" />
+
+
+<p align="left">
+  <strong>Feuille de calcul d'inventaire d'entrepôt plug-and-play, outil de décomposition du vrac vers les SKU et tableau de bord automatisé de réapprovisionnement pour les chaînes d'approvisionnement de la vente au détail, du commerce électronique et de l'habillement — Aucune édition de formule ni programmation requise.</strong>
+</p>
 
 ![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)
-![Platform](https://img.shields.io/badge/Platform-Browser%20%2B%20Excel-success)
-![Tool](https://img.shields.io/badge/Tool-Inventory%20Decision%20Support-orange)
+![Platform](https://img.shields.io/badge/Platform-Web%20Browser%20%2B%20Microsoft%20Excel-success)
+![Category](https://img.shields.io/badge/Template-Multi--Store%20Inventory%20%26%20COGS%20Tracker-orange)
+![Skill Level](https://img.shields.io/badge/User%20Level-Beginner%20Friendly%20%7C%20Copy%20%26%20Paste-brightgreen)
 
-**Automatise ton suivi des SKU et le rapprochement des stocks d'entrepôt avec ce modèle de gestion des stocks piloté par les événements.** Suis chaque mouvement de stock—de la réception en vrac et de la décomposition de production aux ventes omnicanales et aux transferts d'entrepôt—via un flux de travail unique. Disponible sous forme de tableau de bord de chaîne d'approvisionnement gratuit basé sur navigateur et de traqueur d'inventaire Excel premium téléchargeable. Aucune installation ERP complexe ni inscription à un logiciel cloud requise.
+**Le Grand livre d'inventaire pour le commerce de détail et la maquila est un modèle Excel (.xlsx) de gestion d'inventaire multi-magasins prêt à l'emploi et une application web gratuite de contrôle des stocks basée sur le navigateur, conçue pour les propriétaires de petites entreprises, les responsables du commerce de détail et les débutants de la chaîne d'approvisionnement.** Conçu comme une alternative ERP et WMS sans code, ce traqueur d'inventaire automatisé résout les ruptures de stock de SKU, les écarts de stocks fantômes, les erreurs de décomposition des vêtements du vrac à l'unité, le rétrécissement d'entrepôt (merma) et la valorisation du coût des marchandises vendues (COGS) grâce à un simple flux de copier-coller. Suivez chaque mouvement physique de stock—de la réception en vrac des fournisseurs et du tri de production en maquila jusqu'aux ventes omnicanales en POS et aux transferts entre magasins—sans écrire un seul `VLOOKUP`, `SUMIFS` ni macro.
 
-**Aucune inscription. Aucune installation. Prêt à l'emploi dans ton navigateur.**
+**Aucune installation de logiciel. Aucun abonnement cloud. Analyse de données par copier-coller en 1 minute.**
 
-Teste la logique pilotée par les événements via l'application web gratuite. Pour des opérations commerciales hors ligne continues, passe à la version Excel entièrement personnalisable (avec une garantie de remboursement de 30 jours sans questions).
+Validez instantanément la logique de rapprochement automatisée des stocks dans votre navigateur avec la démo gratuite en ligne, ou téléchargez le modèle de feuille de calcul Microsoft Excel permanent et hors ligne (avec une garantie de remboursement de 30 jours sans questions) pour gérer vos opérations quotidiennes de vente au détail et d'entrepôt.
 
-> 🌐 **Teste la démo en direct**  
-> [*Lancer le tableau de bord gratuit de suivi d'inventaire de détail basé sur le web*](https://hyvoid.github.io/Retail-and-Maquila-Inventory-Ledger/)
+> 🌐 **Essayez l'outil d'inventaire en ligne gratuit (bac à sable instantané dans le navigateur)**  
+> [**Lancez la démo interactive gratuite du traqueur d'inventaire de détail basé sur le web et du tableau de bord KPI multi-magasins en direct**](https://hyvoid.github.io/Retail-and-Maquila-Inventory-Ledger/)
 >
-> 📥 **Télécharger la feuille de calcul**  
-> [*Télécharger le modèle Excel premium de grand livre d'inventaire pour les opérations multi-magasins*](https://www.theseusworkshop.com/l/zllojx?utm_source=github&utm_medium=GitHub%20README&utm_campaign=readme%20new%20launch&utm_content=multistore-retail-maquila-inventory)
+> 📥 **Obtenez le système Excel automatisé hors ligne (base de données d'entreprise réutilisable)**  
+> [**Téléchargez le modèle Excel plug-and-play de gestion d'inventaire multi-magasins (.xlsx) avec formules de mise à jour automatique pré-intégrées**](https://www.theseusworkshop.com/l/zllojx?utm_source=github&utm_medium=GitHub%20README&utm_campaign=readme%20new%20launch&utm_content=multistore-retail-maquila-inventory)
 
 ---
 
-## Points de douleur en gestion des stocks et solutions de registre automatisé
+## Ce qu'il vous aide à suivre : points douloureux de l'inventaire de détail vs. solutions de feuilles de calcul automatisées
 
-Au lieu de concilier manuellement les soldes de stock sur plusieurs feuilles de calcul déconnectées—ce qui entraîne des stocks fantômes et des erreurs d'exécution—ce classeur reconstruit en continu **les positions de stock à partir des événements opérationnels** en temps réel. 
+Au lieu d'écraser manuellement des chiffres de stock statiques dans des feuilles déconnectées—ce qui provoque des formules cassées, des stocks fantômes et des erreurs coûteuses d'exécution—cette **feuille de calcul automatisée de contrôle d'inventaire** reconstruit les positions de stock en temps réel à partir des journaux opérationnels quotidiens.
 
-Ce système résout directement les angles morts courants de la chaîne d'approvisionnement en fournissant une visibilité instantanée sur :
-
-- **Disponibilité du stock d'entrepôt :** suis le stock utilisable restant après décomposition de production, transferts internes et gaspillage d'entrepôt enregistré (merma).
-- **Suivi de la vente au détail multi-sites :** surveille les niveaux de stock actuels de chaque SKU dans chaque magasin physique ou point de vente (POS) à partir d'un seul tableau de bord consolidé.
-- **Coût des marchandises vendues (COGS) et évaluation précis :** lie la valeur de ton stock aux coûts unitaires réels définis dans tes données de base, en remplaçant les soldes financiers estimés.
-- **Suivi des pertes et du rétrécissement actionnable :** catégorise les pertes de produits par cause opérationnelle racine, en cartographiant des métriques exactes pour les défauts de production, les dommages de transport et le rétrécissement en magasin de détail.
-- **Performance et vélocité des SKU :** compare la performance des ventes en POS aux taux d'épuisement des stocks pour identifier instantanément les gagnants à rotation rapide et le stock mort.
-- **Indicateurs prédictifs de santé des stocks :** signale les pénuries de stock de sécurité, les situations de surstock et les exceptions de la chaîne d'approvisionnement avant qu'elles n'affectent ta trésorerie.
-
----
-
-## À qui cela s'adresse : rôles cibles et cas d'usage de la chaîne d'approvisionnement
-
-Ce classeur est spécialement conçu pour les organisations qui gèrent des stocks entre des entrepôts centralisés et des points de vente décentralisés, en s'appuyant sur des architectures Excel flexibles ou des données opérationnelles CSV exportées plutôt que sur des implémentations ERP d'entreprise rigides et coûteuses.
-
-**Profils d'utilisateurs cibles et scénarios opérationnels :**
-
-- 🛍️ **Responsables de la chaîne d'approvisionnement de la vente au détail ayant besoin d'un modèle des opérations de stock :** pour orchestrer la redistribution stratégique des stocks entre les magasins au lieu d'émettre aveuglément des bons de commande (POs) lorsque le stock d'entrepôt isolé s'épuise.
-- 🏭 **Responsables de production textile et maquila ayant besoin d'un outil de décomposition en vrac :** pour suivre parfaitement la conversion de la réception en vrac (palettes/cartons) en SKU individuels vendables (matrice Modèle-Couleur-Taille).
-- 📦 **Superviseurs d'entrepôt à la recherche d'une feuille de calcul de comptage cyclique et de rétrécissement :** pour documenter en continu les pertes de produits par cause opérationnelle plutôt que d'attendre le rapprochement physique chaotique de fin de mois.
-- 📊 **Analystes des opérations de commerce électronique et omnicanales construisant des KPI :** pour ingérer rapidement des exports CSV POS (Point de vente) ou Shopify dans un tableau de bord de gestion consolidé pour le reporting quotidien.
-- 🏪 **Propriétaires de petites et moyennes entreprises (PME) recherchant une alternative ERP légère :** pour gérer le routage des stocks et la rentabilité multi-magasins sans les surcoûts, les coûts de formation et les délais d'intégration des systèmes WMS (Warehouse Management Systems) complets.
-
-*(Remarque : ce classeur n'est **pas** destiné à remplacer des systèmes d'entreprise à haut volume nécessitant un verrouillage transactionnel concurrent en temps réel ou des API de scan de codes-barres actives.)*
+| Module de suivi à haute fréquence | Point douloureux courant du commerce de détail et de l'entrepôt | Solution automatisée du grand livre Excel | KPI et métriques exploitables générés |
+| :--- | :--- | :--- | :--- |
+| **Contrôle du stock de l'entrepôt central** | Incertitude sur l'inventaire utilisable après déballage du vrac, transferts internes entre magasins et dommages d'entrepôt non enregistrés. | Déduit automatiquement les expéditions sortantes vers les magasins et le gaspillage consigné des journaux de réception en vrac, en temps réel. | Stock net disponible en entrepôt, taux de conversion palettes-vers-unités, volume de réception entrante. |
+| **Suivi d'inventaire multi-magasins et POS** | Cécité sur les quantités exactes de SKU posées sur les étagères de différentes succursales physiques ou boutiques éphémères. | Consolide les mouvements de stock multi-sites dans une matrice unique sans ajouter d'onglets séparés par magasin. | Unités disponibles par magasin, soldes de transferts inter-magasins, distribution régionale du stock. |
+| **Coût des marchandises vendues (COGS) et valorisation de l'inventaire** | Deviner la valeur en dollars de l'inventaire à la clôture mensuelle parce que les coûts unitaires et les comptages physiques vivent dans des fichiers séparés. | Verrouille les coûts unitaires standard dans la table maître des SKU et multiplie automatiquement les niveaux de stock en temps réel. | Valeur totale de l'actif d'inventaire ($), COGS en temps réel, marge brute par ligne de produit. |
+| **Rétrécissement, gaspillage (merma) et écart de comptage cyclique** | Découvrir d'énormes manquants de stock uniquement lors de comptages physiques chaotiques de fin de mois ou d'année. | Catégorise les pertes d'inventaire par cause racine (défauts de production, dommages de transport, vols en magasin) au fur et à mesure qu'elles surviennent. | Taux de rétrécissement (%), perte financière par cause ($), piste d'audit des écarts de comptage cyclique. |
+| **Vélocité des ventes de SKU et détection de stock mort** | Réordonner des articles à rotation lente pendant que les best-sellers à forte marge tombent en rupture en haute saison. | Compare la vitesse d'épuisement des ventes POS au stock restant en magasin et en entrepôt dans une seule vue visuelle. | Classement des gagnants à rotation rapide, coût de détention du stock mort, taux d'écoulement (%). |
+| **Alertes de stock de sécurité et planification du point de réapprovisionnement** | Émettre des bons de commande (PO) de panique aux fournisseurs quand le stock de l'entrepôt central paraît bas sur le papier. | Évalue les soldes combinés de l'entrepôt et des magasins par rapport aux seuils de sécurité minimum avant d'alerter. | Déclencheurs de réapprovisionnement par stock faible, alertes de surstock, recommandations de redistribution inter-magasins. |
 
 ---
 
-## Tutoriel de démarrage rapide : automatise ton flux de travail d'inventaire (étape par étape)
+## À qui cela s'adresse : rôles professionnels cibles et modèles de feuilles de calcul prêts à l'emploi
 
-Obtenir des informations exploitables sur la chaîne d'approvisionnement ne nécessite que quelques étapes standardisées. Aucune formule complexe n'a besoin d'être modifiée après ta configuration initiale.
+Ce système est conçu pour les opérateurs qui ont besoin d'une **solution d'inventaire Excel plug-and-play immédiate** pour gérer des entrepôts centralisés et des magasins de détail décentralisés à l'aide d'exportations de données CSV standard—sans payer des dizaines de milliers de dollars pour un logiciel ERP d'entreprise rigide.
 
-### 1. Configure les règles métier (configuration des données de base)
-Ouvre la feuille de calcul **Parameters** pour cartographier ton empreinte opérationnelle. Définis ton réseau d'entrepôts et de magasins, personnalise les catégories de gaspillage, importe tes enregistrements de produits de base (SKU) et fixe les coûts unitaires standard. *Action : configure cela une seule fois ; mets à jour uniquement lors de l'ajout de nouvelles gammes de produits ou de nouvelles succursales de vente au détail.*
+* 🛍️ **Responsable de magasin de détail + modèle de transfert de stock multi-sites :** Arrêtez d'émettre des bons de commande fournisseurs à l'aveugle quand les étagères de l'entrepôt central semblent vides. Utilisez la matrice d'inventaire inter-magasins pour repérer le stock à rotation lente dans la Succursale A et le transférer vers la Succursale B à forte demande.
+* 🏭 **Planificateur de production textile et maquila + feuille de décomposition du vrac vers la matrice SKU :** Suivez la conversion exacte des expéditions brutes de matières premières (palettes, cartons maîtres, rouleaux de tissu) en unités de détail individuelles vendables à travers une **matrice SKU Style-Couleur-Taille**.
+* 📦 **Superviseur d'entrepôt + journal structuré de comptage cyclique et de suivi du rétrécissement :** Remplacez les décomptes chaotiques sur porte-bloc par un journal d'audit numérique structuré qui suit quotidiennement les marchandises endommagées, les sous-livraisons fournisseurs et le gaspillage interne d'entrepôt (*merma*).
+* 📊 **Analyste des opérations eCommerce et Shopify + tableau de bord de rapprochement de données CSV POS :** Copiez et collez les exports bruts de ventes de Shopify, Square, Lightspeed ou de systèmes POS hérités directement dans des tables de transactions pré-mappées pour des rapports KPI quotidiens instantanés.
+* 🏪 **Propriétaire de petite entreprise + alternative Excel sans code légère à l'ERP et au WMS :** Gagnez une visibilité de niveau entreprise sur le routage d'inventaire multi-magasins, la rentabilité des produits et la trésorerie immobilisée dans le stock—sans configuration informatique, sans codage et sans frais SaaS mensuels.
 
-### 2. Importe les données opérationnelles (ingestion CSV POS et WMS)
-Copie les enregistrements transactionnels existants dans les tables d'événements désignées. Colle simplement les données de tes exports ERP, fichiers CSV Shopify/POS, journaux de réception des fournisseurs ou feuilles Excel héritées. *Action : colle les données dans les feuilles de transaction. Aucun recalcul manuel de formule n'est requis.*
-
-### 3. Examine les KPI opérationnels (analyse du tableau de bord)
-Navigue directement vers les moteurs d'inventaire ou le tableau de bord de gestion visuel. Le système recalcule automatiquement le stock d'entrepôt, la distribution des SKU multi-magasins, l'évaluation des stocks, les revenus des ventes et l'analyse du gaspillage. *Action : utilise ces informations pour prendre des décisions immédiates de réapprovisionnement ou de transfert.*
-
-### 4. Rafraîchis et répète (cycle de réapprovisionnement continu)
-Répète le processus d'importation de données quotidiennement, hebdomadairement ou mensuellement selon ton cycle d'exécution. Aucune reconception de fichiers. Aucune reconstruction de liens cassés. Ajoute simplement de nouveaux événements métier et rafraîchis. 
-
-> 🚀 **Passe à l'action :** Prêt à standardiser tes opérations ? Une fois ta logique métier validée dans l'essai navigateur gratuit, **[télécharge le modèle d'inventaire Excel](https://www.theseusworkshop.com/l/zllojx?utm_source=github&utm_medium=GitHub%20README&utm_campaign=readme%20new%20launch&utm_content=retail-maquila-inventory-ledger)**. Garde-le localement pour construire une base de données hors ligne sécurisée, reproductible et permanente pour ton entreprise.
+*(Remarque : ce classeur Excel est conçu pour la prise de décision opérationnelle rapide et la propriété des données hors ligne ; il n'est pas destiné à remplacer les bases de données d'entreprise à haute fréquence nécessitant un verrouillage API en direct de pistolets de scan de codes-barres.)*
 
 ---
 
-## Le concept central : pourquoi j'ai construit ce cadre piloté par les événements
+## Scénarios opérationnels les mieux adaptés : résoudre les goulots d'étranglement de la chaîne d'approvisionnement pour débutants et hautes saisons
 
-Beaucoup d'entreprises de vente au détail croient avoir un *problème de stock* systémique alors qu'en réalité, elles souffrent d'un *problème d'architecture de l'information*.
+Que vous lanciez votre deuxième boutique de détail ou que vous vous noyiez dans des feuilles de calcul manuelles pendant les ventes de Noël du quatrième trimestre, ce **grand livre d'inventaire téléchargeable** élimine les goulots d'étranglement de saisie de données pour les utilisateurs non techniques :
 
-Traditionnellement, les stocks sont maintenus en écrasant directement les soldes. La réception met à jour une feuille de calcul. La production en met à jour une autre. Les directeurs de magasin enregistrent les données de point de vente ailleurs. Finalement, les comptages cycliques cessent de concorder, et l'entreprise passe plus de temps à auditer les écarts de stock qu'à optimiser réellement l'exécution.
-
-**J'ai construit ce classeur autour d'un changement de paradigme : le grand livre d'inventaire piloté par les événements.**
-
-Au lieu de maintenir des soldes statiques, chaque activité physique devient un événement immuable. La réception de marchandises en vrac, le transfert de marchandises, la journalisation des dommages de transport et l'enregistrement des ventes au détail sont consignés indépendamment. Le solde de stock est ensuite **automatiquement reconstruit à partir de ces événements historiques**.
-
-### Le piège du réapprovisionnement multi-magasins (un exemple)
-Avant d'utiliser ce cadre, un responsable d'entrepôt pourrait voir qu'**il ne reste que 18 unités du SKU MD-01** dans l'installation centrale et déclencher un PO fournisseur urgent.
-
-En reconstruisant l'historique complet des événements sur l'ensemble du réseau omnicanal, ce modèle révèle la vérité :
-- 60 unités ont été transférées vers les magasins régionaux hier.
-- 42 unités restent invendues dans les points de vente.
-- Le stock de sécurité de l'entrepôt semble bas, mais *le stock à l'échelle de l'entreprise est parfaitement sain*.
-
-**La décision change entièrement :** au lieu de gaspiller de l'argent à fabriquer plus de stock, la direction redistribue le stock de détail existant pour répondre à la demande. Cette logique est universellement applicable, c'est pourquoi ce modèle est structuré comme un actif d'aide à la décision réutilisable.
+1. **Première expansion multi-magasins (passage de 1 à 10+ sites) :** Vous avez dépassé une simple liste de stock à une colonne, et la liaison d'onglets Excel séparés pour chaque nouveau magasin continue de casser vos formules.
+2. **Textile, chaussures et fabrication à façon (déballage du vrac en maquila) :** Vous recevez l'inventaire en lots ou boîtes en vrac, réétiquetez ou assemblez les articles en interne, et vous avez besoin d'un moyen précis de rapprocher les réceptions en vrac des ventes de SKU de détail individuels.
+3. **Rush de haute saison et décisions urgentes :** Pendant les périodes de ventes à fort volume (Black Friday, promotions saisonnières, semaines de marchés de gros), vous ne pouvez pas vous permettre de passer 5 heures à réparer des cellules cassées—vous avez besoin d'un **analyseur d'inventaire copier-coller en 1 minute** pour vous concentrer sur les ventes et la satisfaction client.
+4. **Gestion d'inventaire pour débutants sans formules :** Vous connaissez vos produits et vos clients sur le bout des doigts, mais vous n'êtes pas un magicien d'Excel. Vous avez besoin d'un modèle pré-ingénieré où la logique métier, l'appariement des SKU et les graphiques du tableau de bord se mettent à jour automatiquement dès que vous collez vos chiffres.
 
 ---
 
-## Comparaison des systèmes : feuilles de calcul manuelles vs. registre piloté par les événements
+## Flux de démarrage rapide : tutoriel d'analyse d'inventaire copier-coller en 1 minute (sans édition de formules)
 
-| Défi typique de la chaîne d'approvisionnement de la vente au détail | Limites de la feuille de calcul manuelle | Solution de registre piloté par les événements |
-|---------------------------------------|--------------------------------|------------------------------|
-| **Stock fantôme et dérive des soldes** | Les ajustements manuels écrasent définitivement l'historique, rendant impossibles à auditer les écarts de stock historiques. | Chaque mouvement reste traçable comme un événement métier immuable, créant une piste d'audit infaillible. |
-| **Algorithmes de réapprovisionnement défectueux** | Les décisions d'achat s'appuient exclusivement sur des soldes d'entrepôt isolés, provoquant un surstock de détail. | L'entrepôt central et les stocks des magasins décentralisés sont évalués globalement avant l'émission des PO. |
-| **Détection tardive du rétrécissement** | Le rétrécissement des stocks s'accumule invisiblement jusqu'au redouté comptage cyclique physique de fin de mois.
-| **Complexité de mise à l'échelle multi-magasins** | L'ajout de nouveaux points de vente nécessite de créer de nouveaux onglets de feuille de calcul et de lier péniblement des formules fragiles. | Les nouveaux points de vente (POS) se peuplent automatiquement dans la matrice multi-magasins dynamique sans aucune reconception de formule. |
-| **Suivi imprécis du COGS et des marges** | Les quantités de stock et les coûts unitaires financiers sont conservés dans des fichiers financiers séparés et non synchronisés. | Les niveaux de stock et les données de coûts standard restent parfaitement verrouillés grâce à des enregistrements de base SKU standardisés. |
+En coulisses, le rapprochement multi-sites de la chaîne d'approvisionnement et la valorisation pondérée des stocks impliquent des calculs métier complexes. **Cependant, vous n'avez pas besoin d'apprendre les formules de la chaîne d'approvisionnement ni la programmation Excel pour utiliser cet outil.**
+
+Toutes les règles automatiques d'appariement des SKU, les recherches dynamiques en tableau et les formules d'agrégation de KPI sont déjà pré-intégrées dans le classeur. **Vous n'avez même pas besoin de double-cliquer sur le coin de la cellule pour faire glisser ou copier les formules vers le bas.** Collez simplement vos données brutes, et le modèle calcule tout en un clic.
+
+### Étape 1 : Configurez votre liste maître de SKU et vos sites de magasins (configuration unique)
+Ouvrez l'onglet **Parameters** pour définir votre empreinte commerciale. Saisissez ou collez les noms de vos entrepôts, les sites de vos magasins de détail, les motifs personnalisés de gaspillage/rétrécissement, les codes produit SKU et les coûts unitaires standard.
+* **Action pour débutants :** Remplissez cela une fois lors de la configuration initiale ; n'ajoutez de nouvelles lignes que lorsque vous lancez de nouveaux produits ou ouvrez un nouveau magasin.
+
+### Étape 2 : Copiez-collez les ventes POS quotidiennes, les réceptions et les transferts
+Ouvrez votre export Shopify existant, votre rapport de ventes POS ou votre journal de réception d'entrepôt. Copiez les lignes brutes et collez-les directement dans les **Tables de saisie d'événements** correspondantes (Journaux de réception, Décomposition de production, Transferts inter-magasins, Ventes POS et Journaux de rétrécissement).
+* **Action pour débutants :** Exécution pure de copier-coller. **Zéro glissement manuel de formules, zéro formatage de cellules et zéro débogage de VLOOKUP requis.**
+
+### Étape 3 : Obtenez une analyse métier instantanée en 1 minute et des décisions de réapprovisionnement
+Passez au **Moteur d'inventaire automatisé** ou au **Tableau de bord visuel exécutif**. En 1 minute, le modèle transforme les lignes de transactions brutes en priorités de décision claires :
+* Quels SKU exactement sont sur le point de tomber en rupture dans des magasins spécifiques.
+* Quel magasin surstocké peut transférer des unités pour couvrir la pénurie d'un autre magasin.
+* Combien de trésorerie est actuellement immobilisée dans le stock mort ou perdue par le rétrécissement d'entrepôt.
+
+### Étape 4 : Enregistrez localement et répétez pour des opérations continues en haute saison
+Utilisez dès maintenant la [démo gratuite du traqueur d'inventaire basé sur le web](https://hyvoid.github.io/Retail-and-Maquila-Inventory-Ledger/) pour tester le fonctionnement du suivi piloté par les événements avec des données d'exemple. Une fois que vous voyez à quelle vitesse il organise vos chiffres, passez au classeur Excel hors ligne réutilisable.
+
+> 🚀 **Devenez dès aujourd'hui un expert de l'analyse d'inventaire en 1 minute :**  
+> Arrêtez de gaspiller des heures à lutter contre des feuilles de calcul cassées pendant vos semaines de ventes les plus intenses. [**Téléchargez le modèle Excel automatisé de gestion d'inventaire multi-magasins (.xlsx)**](https://www.theseusworkshop.com/l/zllojx?utm_source=github&utm_medium=GitHub%20README&utm_campaign=readme%20new%20launch&utm_content=multistore-retail-maquila-inventory), collez localement les données de vos magasins et obtenez des décisions de réapprovisionnement et de trésorerie instantanées et sans erreur en moins de 60 secondes.
+
+---
+
+## La logique métier et la méthodologie : éliminer les angles morts coûteux de l'inventaire pour les débutants
+
+La plupart des entreprises de commerce de détail petites et moyennes pensent avoir un *problème de comptage de stock* alors qu'elles ont en réalité un **problème d'architecture de feuille de calcul**.
+
+Si vous gérez l'inventaire en saisissant un nouveau chiffre par-dessus le solde de stock d'hier, vous effacez l'historique. Quand la feuille de l'entrepôt indique 50 unités, la feuille du magasin 12 unités et l'étagère physique 8 unités, vous ne pouvez pas retracer où sont passées les 4 unités manquantes. Vous finissez par passer plus de temps à auditer les erreurs de feuille de calcul qu'à diriger votre entreprise.
+
+Ce modèle résout définitivement ce problème grâce à une **méthodologie de grand livre d'inventaire piloté par les événements**—exactement la même architecture comptable utilisée par les systèmes ERP du Fortune 500, simplifiée en un classeur Excel accessible aux débutants. Chaque action physique (réception d'un carton, déballage d'unités, transfert vers un magasin, réalisation d'une vente ou enregistrement d'un article endommagé) est consignée comme une ligne permanente et horodatée. Votre solde de stock actuel est **calculé automatiquement à partir de la somme de ces événements réels**.
+
+### Trois angles morts du métier que ce modèle expose immédiatement
+
+1. **Angle mort n°1 : le piège du réapprovisionnement multi-magasins (fonds de roulement gaspillé)**
+   * **La réalité objective :** Dans les feuilles de calcul traditionnelles, un acheteur voit que `SKU MD-01` ne compte plus que **18 unités restantes** dans l'entrepôt central et envoie immédiatement de l'argent à un fournisseur pour fabriquer 500 unités de plus.
+   * **Ce que le grand livre révèle :** En suivant les événements de tout le réseau, le tableau de bord montre que 60 unités ont été expédiées hier vers des magasins régionaux et que **42 unités restent invendues sur les étagères des magasins**.
+   * **Impact financier direct :** L'inventaire de l'ensemble de l'entreprise est parfaitement sain (60 unités disponibles au total). Au lieu d'immobiliser des milliers de dollars de trésorerie dans des réapprovisionnements fournisseurs inutiles et des frais de stockage, il suffit de transférer les unités à rotation lente entre magasins pour satisfaire la demande gratuitement.
+2. **Angle mort n°2 : pertes non enregistrées lors de la décomposition du vrac vers l'unité (érosion silencieuse de la marge)**
+   * **La réalité objective :** Dans l'habillement, la maquila et la distribution de gros, les marchandises arrivent en vrac (par exemple, 10 cartons maîtres censés produire 1,000 unités de détail individuelles). Pendant le déballage et le tri par taille et couleur, 35 unités s'avèrent défectueuses ou manquantes, mais le personnel ne saisit que le chiffre final « 965 unités » dans la feuille de stock.
+   * **Impact financier direct :** Ce taux de 3.5% de sous-livraison fournisseur ou de défaut de production disparaît sans laisser de trace, gonflant silencieusement votre coût des marchandises vendues (COGS) et réduisant votre marge bénéficiaire nette. Ce grand livre force le rapprochement entre l'entrée en vrac et la sortie par SKU individuel, vous donnant des données solides pour réclamer des avoirs fournisseurs.
+3. **Angle mort n°3 : confondre le rétrécissement avec la vraie demande des clients (réapprovisionnement défaillant)**
+   * **La réalité objective :** Quand les entreprises écrasent les soldes de stock après un comptage physique, les articles volés ou endommagés paraissent identiques aux articles vendus sur le papier.
+   * **Impact financier direct :** Si 20 unités ont été volées ou écrasées en transit, une feuille de calcul basique suppose que les clients les ont achetées—ce qui vous pousse à réordonner *davantage* d'un produit très sujet aux pertes. Séparer la **vélocité des ventes POS** du **rétrécissement catégorisé (merma)** protège votre budget d'achat d'un réapprovisionnement d'articles non rentables.
+
+---
+
+## Comparaison des fonctionnalités : feuilles de calcul manuelles Excel vs. grand livre d'inventaire automatisé piloté par les événements
+
+| Opération clé de la chaîne d'approvisionnement | Feuilles de stock manuelles traditionnelles | Modèle Excel d'inventaire automatisé piloté par les événements |
+| :--- | :--- | :--- |
+| **Rapprochement des soldes SKU et piste d'audit** | Les écrasements manuels de cellules détruisent les enregistrements historiques ; les erreurs `#REF!` et `VLOOKUP` rendent le stock fantôme introuvable. | Chaque entrée, sortie et transfert est conservé comme un journal de transactions immuable pour une précision d'audit de 100%. |
+| **Point de réapprovisionnement multi-magasins et décisions de PO** | Les achats reposent uniquement sur des comptages isolés de l'entrepôt central, provoquant un surstock chronique en détail et une trésorerie gelée. | Évalue le stock combiné de l'entrepôt central + l'inventaire décentralisé des succursales avant de déclencher des alertes de PO fournisseurs. |
+| **Rétrécissement d'entrepôt (merma) et comptages cycliques** | Les vols, les dommages de transport et les défauts d'usine restent cachés jusqu'aux comptages physiques chaotiques de fin de mois ou d'année. | Consigne le gaspillage en continu par cause racine opérationnelle (dommage, défaut, vol) avec valorisation des pertes financières en temps réel. |
+| **Ajout de nouveaux sites de magasins** | Ouvrir un nouveau magasin exige de dupliquer des onglets de feuille de calcul et de réécrire manuellement des formules complexes inter-feuilles. | Les nouveaux sites POS saisis dans l'onglet Parameters alimentent automatiquement la matrice multi-magasins—zéro édition de formules. |
+| **Valorisation du COGS et suivi de la marge brute** | Les comptages physiques et les coûts unitaires financiers vivent dans des fichiers déconnectés, retardant les rapports financiers de plusieurs semaines. | Les coûts unitaires maîtres des SKU sont liés dynamiquement aux mouvements de stock en direct, calculant la valeur de l'actif d'inventaire et le COGS en temps réel. |
+| **Charge quotidienne de saisie pour les débutants** | Exige des compétences Excel avancées, le glissement manuel de formules et un débogage constant en haute saison de ventes. | Construit avec des tables à extension automatique et des formules prédéfinies ; collez des données brutes POS/CSV et obtenez des graphiques à jour en 1 minute. |
+
+---
+
+## À propos de Theseus Workshop : modèles plug-and-play d'analytique d'entreprise et d'aide à la décision
+
+**Theseus Workshop** crée des outils d'analytique d'entreprise de niveau institutionnel sans code, des modèles financiers automatisés et des modèles opérationnels plug-and-play Microsoft Excel pour les propriétaires de petites entreprises, les opérateurs eCommerce et les responsables de chaîne d'approvisionnement.
+
+Notre mission est de retirer la complexité des logiciels d'entreprise et de la science des données—en transformant des méthodologies opérationnelles avancées en **feuilles de calcul copier-coller de 1 minute** que tout le monde peut utiliser pour prendre des décisions d'affaires plus rapides et plus rentables.
+
+* 🛒 **Explorez tous les modèles d'entreprise et de chaîne d'approvisionnement :** [**Visitez la boutique officielle Theseus Workshop pour les tableaux de bord Excel plug-and-play et les outils d'aide à la décision**](https://www.theseusworkshop.com?utm_source=github&utm_medium=GitHub%20README&utm_campaign=readme%20new%20launch&utm_content=about-section-main-store)
+* 📦 **Obtenez ce système d'inventaire multi-magasins :** [**Téléchargez le grand livre Excel de gestion d'inventaire détail et maquila (.xlsx) sur Theseus Workshop**](https://www.theseusworkshop.com/l/zllojx?utm_source=github&utm_medium=GitHub%20README&utm_campaign=readme%20new%20launch&utm_content=multistore-retail-maquila-inventory)
+* 🖥️ **Testez d'abord dans le navigateur :** [**Ouvrez la démo interactive gratuite du traqueur d'inventaire basé sur le web**](https://hyvoid.github.io/Retail-and-Maquila-Inventory-Ledger/)
 
 ---
 
 ## Détails techniques
 
 <details>
-<summary><strong>Pour les analystes de données, les praticiens d'Excel et les architectes de chaîne d'approvisionnement</strong></summary>
+<summary><strong>Pour les analystes de données, praticiens Excel et architectes de chaîne d'approvisionnement</strong></summary>
 
 ---
 
 ### Architecture des données du grand livre
 
-Le modèle impose une séparation stricte entre la saisie des données (entrées) et le calcul des stocks (sorties). 
+Le modèle impose une séparation stricte entre la saisie des données (entrées) et le calcul de l'inventaire (sorties).
 
 ```text
 Parameters & Product Master Data
@@ -150,59 +187,38 @@ Financial Valuation & COGS
 
 Les données circulent strictement dans un seul sens : **Configuration → Événements métier → Moteur d'inventaire → Tableau de bord**.
 
-### Référence des formules techniques (moteur Excel)
+### Référence technique des formules (moteur Excel)
 
-* **Génération de SKU :** `Model & "-" & Color & "-" & Size` (crée des clés primaires uniques)
-* **Récupération des coûts :** `XLOOKUP()` (lie le coût standard aux données transactionnelles)
-* **Estimation de la réception :** `Box Qty × Pieces per Box`
+* **Génération des SKU :** `Model & "-" & Color & "-" & Size` (Crée des clés primaires uniques)
+* **Récupération des coûts :** `XLOOKUP()` (Lie le coût standard aux données de transaction)
+* **Estimation des réceptions :** `Box Qty × Pieces per Box`
 
-* **Listes dynamiques de SKU et de magasins :** utilise `UNIQUE()` et `FILTER()` pour étendre automatiquement la matrice de suivi à mesure que de nouveaux produits ou magasins sont introduits.
-* **Matrice de tableau croisé :** utilise `TRANSPOSE()` pour pivoter les magasins contre les SKU.
-* **Agrégation d'événements :** utilise une logique `SUMIFS()` robuste pour calculer des combinaisons de `Production - Transferts - Gaspillage - Ventes` à travers des intersections emplacement/SKU spécifiques.
+* **Listes dynamiques de SKU et de magasins :** Utilise `UNIQUE()` et `FILTER()` pour étendre automatiquement la matrice de suivi à mesure que de nouveaux produits ou magasins sont introduits.
+* **Matrice de tabulation croisée :** Utilise `TRANSPOSE()` pour croiser les magasins avec les SKU.
+* **Agrégation des événements :** Utilise une logique robuste `SUMIFS()` pour calculer les combinaisons de `Production - Transfers - Waste - Sales` aux intersections spécifiques site/SKU.
 
-* **Application des clés étrangères :** les SKU, identifiants de magasin et types de gaspillage doivent exister dans les paramètres/données de base, empêchant les erreurs de stock fatales dues aux fautes de frappe.
-* **Règles de type de données :** les quantités de transfert et de vente sont limitées à des entiers positifs pour éviter les ruptures de logique mathématique (par exemple, un stock physique négatif).
+* **Application des clés étrangères :** Les SKU, les identifiants de magasin et les types de gaspillage doivent exister dans Parameters/Données maîtres, évitant ainsi des erreurs d'inventaire fatales dues aux fautes de frappe.
+* **Règles de types de données :** Les quantités de transfert et de vente sont limitées aux entiers positifs pour prévenir les ruptures de logique mathématique (par exemple, un stock physique négatif).
 
 </details>
 
 ---
 
-## La logique métier et la méthodologie
+## Explorez d'autres cadres de chaîne d'approvisionnement et de finance
 
-À la base, cet outil abandonne l'habitude traditionnelle de « l'écrasement des soldes » courante dans la gestion des stocks Excel, la remplaçant par des principes de **comptabilité approvisionnée par les événements (Event-Sourced Accounting)**. En traitant les mouvements physiques de la chaîne d'approvisionnement comme des événements de données immuables, le système résout les problèmes métier structurels qui obligent typiquement les entreprises en croissance à passer prématurément à des mises à niveau ERP coûteuses. 
+Si vous avez trouvé ce modèle opérationnel utile, explorez mes autres boîtes à outils d'aide à la décision conçues pour les opérateurs et les analystes :
 
-Voici la méthodologie exacte utilisée pour résoudre les défis critiques de l'inventaire de détail et de maquila :
+* **[MULTI-NODE-INVENTORY-RECONCILIATION](https://github.com/HyVoid/MULTI-NODE-INVENTORY-RECONCILIATION)** — Pourquoi les sites divergent-ils sur les positions d'inventaire ? — Rapprochez les registres d'inventaire entre plusieurs nœuds opérationnels pour identifier les écarts.
+* **[inventory-planning-reorder-point-excel](https://github.com/HyVoid/inventory-planning-reorder-point-excel)** — Quelle décision d'achat faut-il prendre aujourd'hui compte tenu des tendances de la demande, des délais d'approvisionnement et des contraintes de trésorerie ? — Prévoyez les besoins d'inventaire en combinant signaux de demande, risques de délai, recommandations d'achat et exposition du fonds de roulement.
+* **[Retail-SKU-Concentration-Assortment-Diagnostic-Console](https://github.com/HyVoid/Retail-SKU-Concentration-Assortment-Diagnostic-Console)** — Quels produits dominent le risque d'inventaire ou diluent la qualité de l'assortiment ? — Identifiez le risque de concentration de SKU et l'efficacité de l'assortiment dans les catalogues de produits de détail.
+* **[Universal-3D-Cargo-Loading-Optimization-Simulator](https://github.com/HyVoid/Universal-3D-Cargo-Loading-Optimization-Simulator)** — Comment charger le fret pour réduire l'espace gaspillé et les frictions opérationnelles ? — Simulez des configurations de chargement 3D pour maximiser la capacité des conteneurs et l'efficacité d'expédition.
+* **[Cross-Border-DTC-Inventory-Governance-Console](https://github.com/HyVoid/Cross-Border-DTC-Inventory-Governance-Console)** — Quelle est la vraie demande d'achat après exclusion des obligations de précommande et des retours attendus ? — Reconstruisez de vrais signaux de demande en isolant les engagements de précommande et le comportement de retour des données de ventes brutes.
+* **[inventory-allocation-fulfillment-excel](https://github.com/HyVoid/inventory-allocation-fulfillment-excel)** — Chaque commande client peut-elle réellement être livrée à temps compte tenu du stock physique, des réservations, des conteneurs en transit et des PO ouvertes sur tous nos sites ? — Calculez les quantités disponibles à la promesse et les besoins nets d'approvisionnement en rapprochant le stock physique, les réservations de commandes, l'inventaire en transit et les bons de commande ouverts sur plusieurs sites.
 
-### 1. Méthodologie : reconstruction d'état pilotée par les événements
-- **Le problème métier (stock fantôme et échec d'audit) :** lorsque le personnel d'entrepôt écrase manuellement les cellules de feuille de calcul pour mettre à jour le stock actuel, le contexte historique de *pourquoi* le nombre a changé est définitivement détruit. Cela crée des écarts intraçables entre le registre et le comptage physique.
-- **La logique :** ce système utilise une architecture en ajout seul. Chaque mouvement physique—réception en vrac, décomposition de production, transfert d'entrepôt ou vente POS—est consigné comme un événement indépendant et immuable. Le solde de stock actuel n'est jamais saisi manuellement ; il est reconstruit dynamiquement en calculant la somme nette de ces événements historiques.
-- **Le résultat (100 % d'auditabilité) :** les responsables de la chaîne d'approvisionnement bénéficient d'une piste d'audit infaillible. Si un comptage de stock physique ne correspond pas au système, la direction peut retracer chaque transaction chronologiquement pour localiser la défaillance opérationnelle exacte (par exemple, un journal de transfert manquant ou une vente non enregistrée).
-
-### 2. Méthodologie : matrice d'agrégation des stocks mondial-vers-local
-- **Le problème métier (mauvaise allocation du fonds de roulement) :** les responsables des achats émettent souvent de nouveaux bons de commande (PO) simplement parce que l'entrepôt central est vide, ignorant complètement le stock excédentaire inutilisé dans les succursales de vente au détail décentralisées. Cela piège des fonds de roulement précieux dans un surstock inutile.
-- **La logique :** le moteur de calcul découple *l'actif de stock* de *l'emplacement de stockage*. Il génère une matrice de tableau croisé en temps réel qui évalue simultanément le stock des magasins locaux (au niveau des nœuds) par rapport au stock mondial de l'entreprise (au niveau du réseau).
-- **Le résultat (optimisation omnicanale) :** les équipes opérationnelles peuvent exécuter un rééquilibrage stratégique des stocks. Avant de déployer de l'argent pour fabriquer des marchandises entièrement nouvelles, la direction peut déclencher des transferts latéraux de magasin à magasin ou liquider le stock mort des emplacements à rotation lente.
-
-### 3. Méthodologie : attribution du rétrécissement par cause racine (merma)
-- **Le problème métier (érosion invisible des marges) :** la plupart des PME traitent la perte de stock comme un « coût de faire des affaires » générique, ne découvrant l'impact financier que lors du rapprochement de fin de mois, quand il est trop tard pour y remédier.
-- **La logique :** le rétrécissement est sorti de l'ombre et enregistré comme des événements opérationnels spécifiques liés directement aux coûts unitaires standard (COGS). Les pertes sont explicitement catégorisées par cause racine : défauts de production (maquila), dommages de transport (logistique) ou vol au détail (opérations en magasin).
-- **Le résultat (prévention des pertes actionnable) :** au lieu d'accepter une baisse de marge générique, les contrôleurs financiers peuvent identifier exactement où la valeur fuite. Si un lot de production spécifique produit des défauts élevés, ou si une route de transport spécifique présente des dommages de transport élevés, la direction peut intervenir immédiatement sur la base de données financières quantifiées.
-
----
-
-## Explore d'autres cadres de chaîne d'approvisionnement et financiers
-
-Si tu as trouvé ce modèle opérationnel précieux, explore mes autres boîtes à outils d'aide à la décision conçues pour les opérateurs et les analystes :
-
-* **Boîte à outils de coûts de main-d'œuvre de fabrication et de planification des capacités** — analyse l'efficacité de la main-d'œuvre, les goulets d'étranglement de capacité de production et les coûts de fabrication unitaires.
-* **Console de gouvernance des stocks DTC transfrontalière** — optimise le routage du réapprovisionnement et l'allocation mondiale des stocks à travers les réseaux d'exécution internationaux.
-* **Cadre budgétaire unifié personnel et entreprise** — gère la richesse personnelle et la trésorerie des PME dans un modèle financier intégré.
-* **Dimensionneur et évaluateur de prêts de transition résidentielle** — évalue les scénarios de prêt immobilier, les structures de capital et les métriques de faisabilité de projet.
-
-Suis mon profil GitHub et visite notre [site web](https://www.theseusworkshop.com/) pour les prochains lancements de produits.
+Suivez mon profil GitHub et visitez notre [Site Web](https://www.theseusworkshop.com/) pour connaître les prochains lancements de produits.
 
 ---
 
 ## Licence
 
-Ce projet logiciel et la documentation qui l'accompagne sont publiés sous la **licence Apache 2.0**. Tu es libre d'utiliser, de modifier et de distribuer cette boîte à outils conformément aux termes de la licence open-source Apache 2.0.
+Ce projet logiciel et sa documentation associée sont publiés sous la **licence Apache 2.0**. Vous êtes libre d'utiliser, de modifier et de distribuer cette boîte à outils conformément aux termes de la licence open source Apache 2.0.
