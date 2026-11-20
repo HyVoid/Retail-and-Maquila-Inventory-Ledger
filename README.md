@@ -40,6 +40,14 @@ Instead of manually overwriting static stock numbers across disconnected sheetsâ
 | **SKU Sales Velocity & Dead Stock Detection** | Reordering slow-moving items while high-margin bestsellers run out of stock during peak shopping seasons. | Compares POS sales depletion speed against remaining store and warehouse stock in one visual view. | Fast-Moving Winner Ranking, Dead Stock Holding Cost, Sell-Through Rate (%). |
 | **Safety Stock Alerts & Reorder Point Planning** | Issuing panic purchase orders (POs) to suppliers when central warehouse stock looks low on paper. | Evaluates combined warehouse and retail store balances against minimum safety thresholds before alerting. | Low-Stock Reorder Triggers, Overstock Warnings, Cross-Store Redistribution Recommendations. |
 
+## Spreadsheet Preview
+
+Want to take a closer look before downloading? You can preview the spreadsheet in Google Sheets to explore its layout, structure, and calculation logic.
+
+**[View Spreadsheet Preview on Google Sheets](https://docs.google.com/spreadsheets/d/1B10fC-lsLODm3R2M2Py0ivFRJ23kkQ2-/edit?usp=sharing&ouid=108770714531989318327&rtpof=true&sd=true)**
+
+> **Note on Compatibility:** The Google Sheets preview may display occasional `#NAME?` errors or formula warnings due to differences between Google Sheets and Microsoft Excel formula compatibility. These are preview-only compatibility issues and do not affect the functionality of the original Excel workbook. For the intended formula behavior and full functionality, please download and open the `.xlsx` file in Microsoft Excel.
+
 ---
 
 ## Who This Is For: Target Job Roles & Ready-to-Use Spreadsheet Templates
