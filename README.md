@@ -25,6 +25,19 @@ Validate the automated inventory reconciliation logic instantly in your browser 
 > 📥 **Get the Automated Offline Excel System (Repeatable Business Database)**  
 > [**Download the Plug-and-Play Multi-Store Inventory Management Excel Template (.xlsx) with Pre-Built Auto-Updating Formulas**](https://www.theseusworkshop.com/l/zllojx?utm_source=github&utm_medium=GitHub%20README&utm_campaign=readme%20new%20launch&utm_content=multistore-retail-maquila-inventory)
 
+
+## Questions, Feedback & Product Updates
+
+This toolkit is designed around practical retail multi-store inventory movements, bulk-to-sku conversion and cogs workflows. Feedback helps identify unclear assumptions, missing scenarios, calculation issues, and improvements to the decision process.
+
+- **Questions & workflow fit:** [Ask about bulk receiving and unit conversion, SKU master mapping, store transfers, POS sales, warehouse balances, shrinkage/merma, cycle-count variances, COGS valuation, or replenishment alerts](https://github.com/HyVoid/business-decision-toolbox/discussions/categories/questions).
+- **Ideas & improvements:** [Suggest additional movement types, production conversion rules, shrinkage categories, location-level controls, replenishment logic, or inventory reports](https://github.com/HyVoid/business-decision-toolbox/discussions/categories/ideas).
+- **Report a technical problem:** [Open the Retail-and-Maquila-Inventory-Ledger issue form](https://github.com/HyVoid/Retail-and-Maquila-Inventory-Ledger/issues/new?template=bug-report.yml).
+- **Product updates:** [Follow maintenance and improvement notes](https://github.com/HyVoid/business-decision-toolbox/discussions/categories/product-updates).
+
+Do not post customer receipts, customer identities, employee details, private store addresses, supplier account information, confidential product costs, or raw production exports. Use synthetic SKU codes, store IDs, quantities, and unit costs.
+Use the smallest reproducible example possible. Include the relevant worksheet, input field, date or scenario, and expected versus actual result. Browser demos and spreadsheet previews should be described separately from the downloadable Excel workbook when reporting an environment-specific issue.
+
 ---
 
 ## What It Helps You Track: Retail Inventory Pain Points vs. Automated Spreadsheet Solutions

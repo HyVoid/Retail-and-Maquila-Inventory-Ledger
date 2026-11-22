@@ -1,0 +1,115 @@
+name: Workbook / Tool Issue
+description: Report a reproducible calculation, input, import, compatibility, browser-tool, or documentation problem.
+title: '[Bug]: '
+body:
+- type: markdown
+  attributes:
+    value: 'Use this form only for a reproducible technical issue. For usage questions or feature suggestions, use
+      the [Theseus Workshop Discussions](https://github.com/HyVoid/business-decision-toolbox/discussions) instead.
+
+
+      Do not post customer receipts, customer identities, employee details, private store addresses, supplier account
+      information, confidential product costs, or raw production exports. Use synthetic SKU codes, store IDs, quantities,
+      and unit costs.
+
+
+      Include a synthetic SKU and store ID, movement type, date, quantity/unit of measure, conversion ratio if applicable,
+      and opening/expected/actual stock. Do not attach original POS or warehouse exports.'
+- type: dropdown
+  id: problem_area
+  attributes:
+    label: Which area is affected?
+    options:
+    - SKU master / bulk-to-unit conversion
+    - Supplier receiving / warehouse stock
+    - Maquila production / sorting / yield conversion
+    - POS sales / store-level stock depletion
+    - Inter-store transfer / in-transit stock
+    - Damage / waste / shrinkage (merma) categories
+    - Cycle count / phantom inventory variance
+    - COGS / standard unit cost / inventory valuation
+    - Safety stock / reorder point / dead stock
+    - Browser tracker behaviour
+    - Excel formula / calculation issue
+    - Compatibility / documentation
+    - Other
+  validations:
+    required: true
+- type: dropdown
+  id: environment
+  attributes:
+    label: Where did this happen?
+    options:
+    - Microsoft Excel for Windows
+    - Microsoft Excel for Mac
+    - Excel for the web
+    - Free browser application / calculator
+    - Google Sheets preview
+    - Other / not sure
+  validations:
+    required: true
+- type: input
+  id: version
+  attributes:
+    label: Excel version, browser, or tool version
+    description: Optional. Include the Excel build or browser/version and the date tested, if known.
+    placeholder: Microsoft 365 desktop / Excel 2024 / browser and test date
+  validations:
+    required: false
+- type: textarea
+  id: summary
+  attributes:
+    label: What happened?
+    description: Include a synthetic SKU and store ID, movement type, date, quantity/unit of measure, conversion
+      ratio if applicable, and opening/expected/actual stock. Do not attach original POS or warehouse exports.
+    placeholder: When I enter the synthetic example...
+  validations:
+    required: true
+- type: textarea
+  id: expected_result
+  attributes:
+    label: What did you expect to happen?
+    placeholder: I expected the result or status to...
+  validations:
+    required: true
+- type: textarea
+  id: actual_result
+  attributes:
+    label: What happened instead?
+    description: Include the displayed output, warning, error message, or unexpected behaviour. Remove all confidential
+      information.
+    placeholder: Instead, the tool displays...
+  validations:
+    required: true
+- type: textarea
+  id: reproduction_steps
+  attributes:
+    label: Steps to reproduce
+    description: List the smallest repeatable sequence. Include the worksheet, page, or calculation stage if applicable.
+    placeholder: '1. Open the workbook or browser tool...
+
+      2. Enter synthetic sample values...
+
+      3. Review the affected output...'
+  validations:
+    required: false
+- type: textarea
+  id: safe_example
+  attributes:
+    label: Synthetic example / affected cell or field
+    description: Optional. Include fictitious identifiers, values, units, dates, or column names. Do not attach
+      original source files.
+    placeholder: 'Synthetic ID: ... | Input: ... | Expected: ... | Actual: ...'
+  validations:
+    required: false
+- type: checkboxes
+  id: privacy_check
+  attributes:
+    label: Public issue and data-safety confirmation
+    options:
+    - label: I have used synthetic or properly anonymized examples and removed personal identifiers, customer or
+        supplier data, confidential commercial or engineering information, financial records, credentials, and other
+        sensitive details.
+      required: true
+    - label: I understand this is a public GitHub issue, not a private support channel.
+      required: true
